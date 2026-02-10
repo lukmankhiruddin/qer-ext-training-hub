@@ -1,23 +1,15 @@
-# Meta/Facebook Redesign Todo
+# Modern Meta/Apple Hybrid Redesign
 
-## Phase 1: Research & Plan
-- [ ] Define Meta design tokens (colors, fonts, spacing, shadows, radii)
-
-## Phase 2: Global Theme Update
-- [ ] Update index.html — replace Google Fonts with Meta system font stack
-- [ ] Update index.css — Meta blue palette, clean shadows, tighter radii
-- [ ] Remove Instrument Serif/DM Sans, use system fonts
-
-## Phase 3: Redesign All Pages
-- [ ] Redesign AppLayout — Meta-style top nav with blue header
-- [ ] Redesign Home.tsx — Facebook-style card layout, remove editorial hero
-- [ ] Redesign Schedule.tsx — Clean card-based calendar, Meta interactions
-- [ ] Redesign Directory.tsx — Facebook-style people cards
-- [ ] Redesign Programs.tsx — Clean table/card layout
-- [ ] Update EditableField.tsx — Meta-style inline editing
-
-## Phase 4: Test & Deliver
-- [ ] Test all pages visually
-- [ ] Test SME filter dimming behavior
-- [ ] Test admin mode
-- [ ] Save checkpoint and deliver
+## Visual Updates
+- [ ] Replace font with Inter Variable (modern, clean, Apple-adjacent)
+- [ ] Update color palette: vibrant blues, soft purples, warm gradients
+- [ ] Add glassmorphism: frosted glass cards, translucent nav bar
+- [ ] Add subtle mesh/gradient backgrounds instead of flat #F0F2F5
+- [ ] Modernize shadows: colored shadows, not gray box-shadows
+- [ ] Add smooth spring animations with framer-motion
+- [ ] Update badges/pills with gradient fills and softer corners
+- [ ] Add hover micro-interactions: scale, glow, lift effects
+- [ ] Modernize navigation bar with blur backdrop
+- [ ] Update card designs with glass morphism and subtle borders
+- [ ] Add gradient accent elements (dividers, progress bars, status dots)
+- [ ] Redesign all pages with the new visual language

@@ -1,6 +1,6 @@
 /*
  * EditableField — Inline editing component for admin mode
- * Design: Meta/Facebook — Clean blue focus ring, subtle hover border
+ * Design: Modern Meta/Apple hybrid — glass focus ring, smooth transitions
  */
 import { useState, useRef, useEffect } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -17,49 +17,27 @@ interface EditableFieldProps {
 }
 
 export default function EditableField({
-  value,
-  fieldId,
-  onSave,
-  className = "",
-  as: Tag = "span",
-  multiline = false,
+  value, fieldId, onSave, className = "", as: Tag = "span", multiline = false,
 }: EditableFieldProps) {
   const { isAdmin } = useAdmin();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    setEditValue(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
+  useEffect(() => { setEditValue(value); }, [value]);
+  useEffect(() => { if (isEditing && inputRef.current) { inputRef.current.focus(); inputRef.current.select(); } }, [isEditing]);
 
   const handleSave = () => {
-    if (editValue.trim() !== value) {
-      onSave(editValue.trim());
-    }
+    if (editValue.trim() !== value) onSave(editValue.trim());
     setIsEditing(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !multiline) {
-      handleSave();
-    }
-    if (e.key === "Escape") {
-      setEditValue(value);
-      setIsEditing(false);
-    }
+    if (e.key === "Enter" && !multiline) handleSave();
+    if (e.key === "Escape") { setEditValue(value); setIsEditing(false); }
   };
 
-  if (!isAdmin) {
-    return <Tag className={className}>{value}</Tag>;
-  }
+  if (!isAdmin) return <Tag className={className}>{value}</Tag>;
 
   if (isEditing) {
     return (
@@ -72,7 +50,7 @@ export default function EditableField({
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
             className={cn(
-              "bg-white border-2 border-primary rounded-lg px-2.5 py-1.5 text-[#050505] focus:outline-none shadow-[0_0_0_2px_rgba(24,119,242,0.2)] resize-none min-w-[200px] text-[14px]",
+              "bg-white/95 backdrop-blur-sm border-2 border-primary rounded-xl px-3 py-2 text-foreground focus:outline-none shadow-[0_0_0_3px_oklch(0.55_0.22_264_/_12%)] resize-none min-w-[200px] text-[13px] transition-all duration-200",
               className
             )}
             rows={3}
@@ -86,14 +64,14 @@ export default function EditableField({
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
             className={cn(
-              "bg-white border-2 border-primary rounded-lg px-2.5 py-1 text-[#050505] focus:outline-none shadow-[0_0_0_2px_rgba(24,119,242,0.2)] min-w-[120px] text-[14px]",
+              "bg-white/95 backdrop-blur-sm border-2 border-primary rounded-xl px-3 py-1.5 text-foreground focus:outline-none shadow-[0_0_0_3px_oklch(0.55_0.22_264_/_12%)] min-w-[120px] text-[13px] transition-all duration-200",
               className
             )}
           />
         )}
         <button
           onClick={handleSave}
-          className="p-1.5 rounded-full bg-primary hover:bg-[#1565D8] text-white transition-colors duration-150"
+          className="p-1.5 rounded-xl gradient-hero text-white shadow-[0_2px_6px_oklch(0.55_0.22_264_/_20%)] hover:opacity-90 transition-all duration-200"
         >
           <Check className="w-3.5 h-3.5" />
         </button>
@@ -104,13 +82,13 @@ export default function EditableField({
   return (
     <Tag
       className={cn(
-        "relative group/edit cursor-pointer rounded-md px-1 -mx-1 transition-all duration-150 hover:bg-[#E7F3FF]",
+        "relative group/edit cursor-pointer rounded-lg px-1 -mx-1 transition-all duration-200 hover:bg-primary/6",
         className
       )}
       onClick={() => setIsEditing(true)}
     >
       {value}
-      <Pencil className="inline-block w-3 h-3 ml-1 opacity-0 group-hover/edit:opacity-70 text-primary transition-opacity duration-150" />
+      <Pencil className="inline-block w-3 h-3 ml-1 opacity-0 group-hover/edit:opacity-60 text-primary transition-all duration-200" />
     </Tag>
   );
 }

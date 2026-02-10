@@ -3,23 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * META / FACEBOOK DESIGN SYSTEM
- * ─────────────────────────────
- * Primary Blue: #1877F2
- * Background: #F0F2F5
- * Cards: #FFFFFF with subtle shadow
- * Text: #050505 primary, #65676B secondary
- * System font stack: Segoe UI, Helvetica, Arial
- * Border radius: 8px cards, 6px buttons
- * Shadows: 0 1px 2px rgba(0,0,0,0.1)
- */
-
 @theme inline {
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -52,51 +40,53 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Meta custom tokens */
-  --color-meta-blue: oklch(0.55 0.22 260);
-  --color-meta-blue-light: oklch(0.92 0.04 255);
-  --color-meta-blue-hover: oklch(0.50 0.22 260);
-  --color-meta-green: oklch(0.65 0.19 145);
-  --color-meta-red: oklch(0.60 0.24 25);
-  --color-meta-yellow: oklch(0.80 0.16 85);
-  --font-sans: "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 :root {
-  --radius: 8px;
-  /* Meta Facebook Light Theme */
-  --background: oklch(0.955 0.005 250);       /* #F0F2F5 */
-  --foreground: oklch(0.13 0.01 250);         /* #050505 */
-  --card: oklch(1 0 0);                       /* #FFFFFF */
-  --card-foreground: oklch(0.13 0.01 250);    /* #050505 */
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.13 0.01 250);
-  --primary: oklch(0.55 0.22 260);            /* #1877F2 Facebook Blue */
-  --primary-foreground: oklch(1 0 0);         /* White */
-  --secondary: oklch(0.92 0.04 255);          /* Light blue bg */
-  --secondary-foreground: oklch(0.55 0.22 260);
-  --muted: oklch(0.955 0.005 250);            /* #F0F2F5 */
-  --muted-foreground: oklch(0.48 0.02 250);   /* #65676B */
-  --accent: oklch(0.955 0.005 250);
-  --accent-foreground: oklch(0.13 0.01 250);
-  --destructive: oklch(0.60 0.24 25);         /* #FA3E3E */
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.85 0.01 250);             /* #CED0D4 */
-  --input: oklch(0.85 0.01 250);
-  --ring: oklch(0.55 0.22 260);               /* Facebook Blue */
-  --chart-1: oklch(0.55 0.22 260);
-  --chart-2: oklch(0.65 0.19 145);
-  --chart-3: oklch(0.80 0.16 85);
-  --chart-4: oklch(0.60 0.24 25);
-  --chart-5: oklch(0.70 0.15 300);
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.13 0.01 250);
-  --sidebar-primary: oklch(0.55 0.22 260);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.92 0.04 255);
-  --sidebar-accent-foreground: oklch(0.13 0.01 250);
-  --sidebar-border: oklch(0.85 0.01 250);
-  --sidebar-ring: oklch(0.55 0.22 260);
+  --radius: 0.875rem;
+  /* Vibrant modern blue — slightly warmer than classic Meta */
+  --primary: oklch(0.55 0.22 264);
+  --primary-foreground: oklch(0.99 0 0);
+  /* Background: very subtle warm gray with a hint of blue */
+  --background: oklch(0.975 0.005 270);
+  --foreground: oklch(0.15 0.02 260);
+  /* Cards: white with slight translucency for glass effect */
+  --card: oklch(1 0 0 / 80%);
+  --card-foreground: oklch(0.15 0.02 260);
+  --popover: oklch(1 0 0 / 92%);
+  --popover-foreground: oklch(0.15 0.02 260);
+  /* Secondary: soft lavender tint */
+  --secondary: oklch(0.955 0.015 280);
+  --secondary-foreground: oklch(0.35 0.03 260);
+  /* Muted: gentle gray-blue */
+  --muted: oklch(0.94 0.01 270);
+  --muted-foreground: oklch(0.5 0.02 260);
+  /* Accent: vibrant blue-purple tint */
+  --accent: oklch(0.93 0.03 275);
+  --accent-foreground: oklch(0.2 0.03 260);
+  /* Destructive */
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  /* Borders: very subtle, almost invisible */
+  --border: oklch(0.92 0.01 270 / 60%);
+  --input: oklch(0.93 0.01 270);
+  --ring: oklch(0.55 0.22 264);
+  /* Charts: vibrant gradient palette */
+  --chart-1: oklch(0.7 0.18 250);
+  --chart-2: oklch(0.6 0.22 264);
+  --chart-3: oklch(0.55 0.2 280);
+  --chart-4: oklch(0.65 0.15 300);
+  --chart-5: oklch(0.7 0.12 320);
+  /* Sidebar */
+  --sidebar: oklch(0.99 0.002 270);
+  --sidebar-foreground: oklch(0.15 0.02 260);
+  --sidebar-primary: oklch(0.55 0.22 264);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.95 0.02 275);
+  --sidebar-accent-foreground: oklch(0.2 0.03 260);
+  --sidebar-border: oklch(0.92 0.01 270 / 50%);
+  --sidebar-ring: oklch(0.55 0.22 264);
 }
 
 @layer base {
@@ -105,7 +95,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -151,48 +141,177 @@
     }
   }
 
-  /* Meta-style card shadow */
-  .meta-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+  /* ===== MODERN GLASS CARD ===== */
+  .glass-card {
+    background: oklch(1 0 0 / 72%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid oklch(1 0 0 / 30%);
+    border-radius: 1rem;
+    box-shadow:
+      0 1px 3px oklch(0.55 0.22 264 / 4%),
+      0 4px 16px oklch(0.4 0.1 270 / 6%);
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glass-card:hover {
+    box-shadow:
+      0 2px 8px oklch(0.55 0.22 264 / 8%),
+      0 8px 32px oklch(0.4 0.1 270 / 10%);
   }
 
-  .meta-card-elevated {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Meta-style badge */
-  .meta-badge {
+  /* ===== VIBRANT BADGE ===== */
+  .vibrant-badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
+    gap: 0.25rem;
+    font-size: 0.6875rem;
     font-weight: 600;
-    line-height: 1.4;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 9999px;
+    letter-spacing: 0.01em;
+  }
+  .vibrant-badge-blue {
+    background: linear-gradient(135deg, oklch(0.9 0.06 264), oklch(0.92 0.04 280));
+    color: oklch(0.4 0.18 264);
+  }
+  .vibrant-badge-green {
+    background: linear-gradient(135deg, oklch(0.92 0.06 155), oklch(0.94 0.04 140));
+    color: oklch(0.4 0.14 155);
+  }
+  .vibrant-badge-amber {
+    background: linear-gradient(135deg, oklch(0.92 0.06 80), oklch(0.94 0.04 60));
+    color: oklch(0.45 0.14 65);
+  }
+  .vibrant-badge-purple {
+    background: linear-gradient(135deg, oklch(0.9 0.06 300), oklch(0.92 0.04 310));
+    color: oklch(0.4 0.16 300);
+  }
+  .vibrant-badge-rose {
+    background: linear-gradient(135deg, oklch(0.92 0.06 10), oklch(0.94 0.04 350));
+    color: oklch(0.45 0.16 10);
+  }
+  .vibrant-badge-gray {
+    background: linear-gradient(135deg, oklch(0.94 0.005 270), oklch(0.96 0.003 260));
+    color: oklch(0.45 0.02 260);
   }
 
-  .meta-badge-blue {
-    background: oklch(0.92 0.04 255);
-    color: oklch(0.55 0.22 260);
+  /* ===== GRADIENT BACKGROUNDS ===== */
+  .gradient-mesh {
+    background:
+      radial-gradient(ellipse at 20% 0%, oklch(0.92 0.06 264 / 40%) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, oklch(0.93 0.05 300 / 30%) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, oklch(0.95 0.03 200 / 20%) 0%, transparent 70%),
+      oklch(0.975 0.005 270);
   }
 
-  .meta-badge-green {
-    background: oklch(0.92 0.06 145);
-    color: oklch(0.45 0.15 145);
+  .gradient-hero {
+    background: linear-gradient(135deg,
+      oklch(0.45 0.22 264) 0%,
+      oklch(0.5 0.2 280) 40%,
+      oklch(0.55 0.18 300) 100%
+    );
   }
 
-  .meta-badge-yellow {
-    background: oklch(0.94 0.06 85);
-    color: oklch(0.50 0.14 85);
+  .gradient-text {
+    background: linear-gradient(135deg,
+      oklch(0.45 0.22 264) 0%,
+      oklch(0.5 0.2 290) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .meta-badge-red {
-    background: oklch(0.93 0.04 25);
-    color: oklch(0.50 0.20 25);
+  /* ===== GLOW EFFECTS ===== */
+  .glow-blue {
+    box-shadow: 0 0 20px oklch(0.55 0.22 264 / 15%),
+                0 0 60px oklch(0.55 0.22 264 / 5%);
+  }
+  .glow-blue-sm {
+    box-shadow: 0 0 12px oklch(0.55 0.22 264 / 10%);
+  }
+
+  /* ===== FROSTED NAV ===== */
+  .frosted-nav {
+    background: oklch(1 0 0 / 72%);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-bottom: 1px solid oklch(0.9 0.01 270 / 50%);
+  }
+
+  /* ===== SPRING ANIMATION KEYFRAMES ===== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 8px oklch(0.55 0.22 264 / 20%); }
+    50% { box-shadow: 0 0 20px oklch(0.55 0.22 264 / 35%); }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* ===== HOVER LIFT ===== */
+  .hover-lift {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 4px 12px oklch(0.55 0.22 264 / 8%),
+      0 12px 40px oklch(0.4 0.1 270 / 8%);
+  }
+
+  /* ===== MODERN SCROLLBAR ===== */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.75 0.02 270);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.6 0.04 270);
   }
 }
