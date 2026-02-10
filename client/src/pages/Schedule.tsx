@@ -1,8 +1,8 @@
 /*
- * Schedule — Weekly Calendar View with SME Filtering
+ * Schedule — Weekly Calendar View with Wave Switching & SME Filtering
  * Design: Meta/Facebook — White cards on gray bg, blue filter pills
+ * Supports Wave 1 (completed), Wave 2 (active), Wave 3 (upcoming)
  * When SME filters their name, unrelated days dim to 30% opacity
- * maintaining spatial context while highlighting relevant sessions
  */
 import { useState, useMemo } from "react";
 import { useData } from "@/contexts/DataContext";
@@ -17,6 +17,9 @@ import {
   X,
   Plus,
   Trash2,
+  CheckCircle2,
+  Circle,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,33 +39,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { getSessionTypeBadge, getDaysOfWeek, type TrainingSession } from "@/lib/data";
+import { getSessionTypeBadge, getStatusBadge, type TrainingSession } from "@/lib/data";
 import { toast } from "sonner";
 
-const DAYS = getDaysOfWeek();
-const DAY_DATES: Record<string, string> = {
-  Monday: "Feb 10",
-  Tuesday: "Feb 11",
-  Wednesday: "Feb 12",
-  Thursday: "Feb 13",
+// Date info per wave
+const WAVE_DATE_MAP: Record<string, Record<string, string>> = {
+  "prog-1": { Monday: "Jan 20", Tuesday: "Jan 21", Wednesday: "Jan 22", Thursday: "Jan 23", Friday: "Jan 24" },
+  "prog-2": { Monday: "Feb 10", Tuesday: "Feb 11", Wednesday: "Feb 12", Thursday: "Feb 13" },
+  "prog-3": { Monday: "Mar 10", Tuesday: "Mar 11", Wednesday: "Mar 12", Thursday: "Mar 13", Friday: "Mar 14" },
 };
 
 export default function Schedule() {
-  const { schedule, updateSession, addSession, deleteSession } = useData();
+  const { schedule, programs, activeWaveId, setActiveWaveId, getScheduleForWave, updateSession, addSession, deleteSession } = useData();
   const { isAdmin } = useAdmin();
   const [selectedSME, setSelectedSME] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
+  // Current wave program
+  const activeProgram = programs.find(p => p.id === activeWaveId);
+  const currentSchedule = getScheduleForWave(activeWaveId);
+  const DAYS = activeProgram?.daysOfWeek ?? ["Monday", "Tuesday", "Wednesday", "Thursday"];
+  const DAY_DATES = WAVE_DATE_MAP[activeWaveId] ?? {};
+
   // Get unique SMEs for filter
   const uniqueSMEs = useMemo(() => {
-    const smes = new Set(schedule.map(s => s.sme).filter(s => s !== "N/A"));
+    const smes = new Set(currentSchedule.map(s => s.sme).filter(s => s !== "N/A"));
     return Array.from(smes).sort();
-  }, [schedule]);
+  }, [currentSchedule]);
 
   // Filter logic
   const filteredSchedule = useMemo(() => {
-    let filtered = schedule;
+    let filtered = currentSchedule;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -73,29 +81,25 @@ export default function Schedule() {
       );
     }
     return filtered;
-  }, [schedule, searchQuery]);
+  }, [currentSchedule, searchQuery]);
 
   // Determine which days have sessions for the selected SME
   const activeDays = useMemo(() => {
     if (selectedSME === "all") return new Set(DAYS);
     const days = new Set<string>();
-    schedule.forEach(s => {
+    currentSchedule.forEach(s => {
       if (s.sme.toLowerCase().includes(selectedSME.toLowerCase())) {
         days.add(s.day);
       }
     });
     return days;
-  }, [schedule, selectedSME]);
+  }, [currentSchedule, selectedSME, DAYS]);
 
   // Get sessions for a specific day
   const getSessionsForDay = (day: string) => {
     return filteredSchedule
       .filter(s => s.day === day)
-      .sort((a, b) => {
-        const timeA = parseTime(a.timeStart);
-        const timeB = parseTime(b.timeStart);
-        return timeA - timeB;
-      });
+      .sort((a, b) => parseTime(a.timeStart) - parseTime(b.timeStart));
   };
 
   // Check if a session matches the SME filter
@@ -115,15 +119,18 @@ export default function Schedule() {
   });
 
   const handleAddSession = () => {
+    const dayDates = WAVE_DATE_MAP[activeWaveId] ?? {};
+    const dateStr = dayDates[newSession.day] ?? "TBD";
     const session: TrainingSession = {
       id: `ts-new-${Date.now()}`,
       day: newSession.day,
-      date: `2025-02-${newSession.day === "Monday" ? "10" : newSession.day === "Tuesday" ? "11" : newSession.day === "Wednesday" ? "12" : "13"}`,
+      date: dateStr,
       timeStart: newSession.timeStart,
       timeEnd: newSession.timeEnd,
       training: newSession.training,
       sme: newSession.sme || "N/A",
       type: newSession.type,
+      waveId: activeWaveId,
     };
     addSession(session);
     setAddDialogOpen(false);
@@ -131,9 +138,16 @@ export default function Schedule() {
     toast("Session added", { description: `${session.training} on ${session.day}` });
   };
 
+  // Reset SME filter when switching waves
+  const handleWaveSwitch = (waveId: string) => {
+    setActiveWaveId(waveId);
+    setSelectedSME("all");
+    setSearchQuery("");
+  };
+
   return (
     <div className="bg-[#F0F2F5] min-h-screen">
-      {/* Header — Meta style: white banner */}
+      {/* Header */}
       <div className="bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
         <div className="container py-5">
           <div className="flex items-center gap-2 mb-1">
@@ -146,13 +160,70 @@ export default function Schedule() {
             Training Calendar
           </h1>
           <p className="text-[15px] text-[#65676B]">
-            Wave 2 Complex Object Training · Dublin · Feb 10–13, 2025
+            {activeProgram?.wave ?? "Training Schedule"} · {activeProgram?.location ?? "Dublin"} · {activeProgram ? `${formatDateShort(activeProgram.startDate)}–${formatDateShort(activeProgram.endDate)}` : ""}
           </p>
         </div>
       </div>
 
       <div className="container py-4">
-        {/* Filters Bar — Meta style: white card with inputs */}
+        {/* Wave Switcher — horizontal timeline */}
+        <div className="meta-card p-4 mb-4">
+          <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-3">Training Waves</p>
+          <div className="flex items-center gap-0 overflow-x-auto pb-1">
+            {programs.map((prog, idx) => {
+              const status = getStatusBadge(prog.status);
+              const isActive = prog.id === activeWaveId;
+              const isLast = idx === programs.length - 1;
+
+              return (
+                <div key={prog.id} className="flex items-center shrink-0">
+                  <button
+                    onClick={() => handleWaveSwitch(prog.id)}
+                    className={cn(
+                      "flex items-center gap-2.5 px-4 py-2.5 rounded-lg transition-all duration-150 text-left",
+                      isActive
+                        ? "bg-[#E7F3FF] ring-1 ring-primary/20"
+                        : "hover:bg-[#F0F2F5]"
+                    )}
+                  >
+                    {/* Status icon */}
+                    {prog.status === "completed" ? (
+                      <CheckCircle2 className="w-5 h-5 text-[#65676B] shrink-0" />
+                    ) : prog.status === "active" ? (
+                      <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                      </div>
+                    ) : (
+                      <Circle className="w-5 h-5 text-[#CED0D4] shrink-0" />
+                    )}
+                    <div>
+                      <p className={cn(
+                        "text-[14px] font-semibold leading-tight",
+                        isActive ? "text-primary" : "text-[#050505]"
+                      )}>
+                        {prog.wave.split("—")[0].trim()}
+                      </p>
+                      <p className="text-[11px] text-[#8A8D91] mt-0.5">
+                        {formatDateShort(prog.startDate)} – {formatDateShort(prog.endDate)}
+                      </p>
+                    </div>
+                    <span className={cn(
+                      "ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full",
+                      status.bgColor, status.textColor
+                    )}>
+                      {status.label}
+                    </span>
+                  </button>
+                  {!isLast && (
+                    <ArrowRight className="w-4 h-4 text-[#CED0D4] mx-1 shrink-0" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Filters Bar */}
         <div className="meta-card p-4 mb-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {/* Search */}
@@ -192,7 +263,7 @@ export default function Schedule() {
               </Select>
             </div>
 
-            {/* Active filter indicator — Meta style: blue pill */}
+            {/* Active filter indicator */}
             {selectedSME !== "all" && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold bg-[#E7F3FF] text-primary">
                 <User className="w-3 h-3" />
@@ -271,7 +342,12 @@ export default function Schedule() {
         </div>
 
         {/* Weekly Calendar Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={cn(
+          "grid gap-4",
+          DAYS.length === 5
+            ? "grid-cols-1 md:grid-cols-3 lg:grid-cols-5"
+            : "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+        )}>
           {DAYS.map(day => {
             const sessions = getSessionsForDay(day);
             const isDayActive = activeDays.has(day);
@@ -284,7 +360,7 @@ export default function Schedule() {
                   isDayActive ? "opacity-100" : "opacity-30"
                 )}
               >
-                {/* Day Header — Meta style: white card header */}
+                {/* Day Header */}
                 <div className={cn(
                   "meta-card mb-3 p-3 transition-all duration-200",
                   isDayActive && selectedSME !== "all"
@@ -295,7 +371,7 @@ export default function Schedule() {
                     <div>
                       <h3 className="text-[17px] font-bold text-[#050505]">{day}</h3>
                       <p className="text-[12px] text-[#8A8D91] font-medium">
-                        {DAY_DATES[day]}
+                        {DAY_DATES[day] ?? ""}
                       </p>
                     </div>
                     <span className="text-[12px] text-[#8A8D91] font-medium bg-[#F0F2F5] px-2 py-0.5 rounded-full">
@@ -425,7 +501,7 @@ export default function Schedule() {
           })}
         </div>
 
-        {/* Legend — Meta style */}
+        {/* Legend */}
         <div className="meta-card mt-6 p-4">
           <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-3">Session Types</p>
           <div className="flex flex-wrap gap-5">
@@ -459,4 +535,14 @@ function parseTime(time: string): number {
   if (period === "PM" && hours !== 12) hours += 12;
   if (period === "AM" && hours === 12) hours = 0;
   return hours * 60 + minutes;
+}
+
+// Helper: format date like "Feb 10"
+function formatDateShort(dateStr: string): string {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const parts = dateStr.split("-");
+  if (parts.length < 3) return dateStr;
+  const month = months[parseInt(parts[1]) - 1] ?? parts[1];
+  const day = parseInt(parts[2]);
+  return `${month} ${day}`;
 }

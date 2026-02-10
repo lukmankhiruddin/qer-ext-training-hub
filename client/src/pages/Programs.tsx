@@ -1,6 +1,7 @@
 /*
- * Programs — Program Itinerary Management
+ * Programs — Program Itinerary Management with Wave 1/2/3
  * Design: Meta/Facebook — Clean white cards, blue accents, system fonts
+ * Shows all waves with their schedules, modules, and SME assignments
  * Admin can edit program details inline
  */
 import { useData } from "@/contexts/DataContext";
@@ -16,13 +17,26 @@ import {
   Users,
   Building2,
   ArrowRight,
+  BookOpen,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
+import { getSessionTypeBadge, getStatusBadge } from "@/lib/data";
+
+function formatDateShort(dateStr: string): string {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const parts = dateStr.split("-");
+  if (parts.length < 3) return dateStr;
+  const month = months[parseInt(parts[1]) - 1] ?? parts[1];
+  const day = parseInt(parts[2]);
+  return `${month} ${day}`;
+}
 
 export default function Programs() {
-  const { programs, smes, schedule, contacts, updateProgram } = useData();
+  const { programs, smes, schedule, contacts, updateProgram, getScheduleForWave, setActiveWaveId } = useData();
   const { isAdmin } = useAdmin();
 
   const statusConfig = {
@@ -51,7 +65,7 @@ export default function Programs() {
 
   return (
     <div className="bg-[#F0F2F5] min-h-screen">
-      {/* Header — Meta style */}
+      {/* Header */}
       <div className="bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
         <div className="container py-5">
           <div className="flex items-center gap-2 mb-1">
@@ -64,7 +78,7 @@ export default function Programs() {
             Training Programs
           </h1>
           <p className="text-[15px] text-[#65676B] max-w-lg">
-            Manage and track vendor training programs across all locations. View schedules, SME assignments, and program status.
+            Track all training waves — past, current, and upcoming. View schedules, SME assignments, and program status at a glance.
           </p>
         </div>
       </div>
@@ -74,6 +88,11 @@ export default function Programs() {
         <div className="space-y-4">
           {programs.map((program) => {
             const status = statusConfig[program.status];
+            const waveSchedule = getScheduleForWave(program.id);
+            const waveSMEs = new Set(waveSchedule.map(s => s.sme).filter(s => s !== "N/A"));
+            const liveSessions = waveSchedule.filter(s => s.type === "live").length;
+            const selfStudySessions = waveSchedule.filter(s => s.type === "self-study").length;
+            const upskillingCount = waveSchedule.filter(s => s.type === "upskilling").length;
 
             return (
               <div
@@ -98,6 +117,12 @@ export default function Programs() {
                           <span className={cn("w-2 h-2 rounded-full", status.dotColor, program.status === "active" && "animate-pulse")} />
                           {status.label}
                         </span>
+                        {program.status === "upcoming" && (
+                          <span className="text-[12px] text-primary font-medium flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            Starts {formatDateShort(program.startDate)}
+                          </span>
+                        )}
                       </div>
 
                       {isAdmin ? (
@@ -141,6 +166,37 @@ export default function Programs() {
                         </p>
                       )}
 
+                      {/* Modules */}
+                      {program.modules && program.modules.length > 0 && (
+                        <div className="mt-4">
+                          <p className="text-[11px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Training Modules</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {program.modules.map((mod, mi) => (
+                              <span key={mi} className="text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#F0F2F5] text-[#65676B]">
+                                {mod}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SMEs Involved */}
+                      {program.smesInvolved && program.smesInvolved.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-[11px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">SMEs Assigned</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {program.smesInvolved.map((sme, si) => (
+                              <span key={si} className="inline-flex items-center gap-1.5 text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#E7F3FF] text-primary">
+                                <span className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary">
+                                  {sme.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                                </span>
+                                {sme}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Meta info */}
                       <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-[#CED0D4]/40">
                         <div className="flex items-center gap-1.5 text-[14px] text-[#65676B]">
@@ -149,106 +205,77 @@ export default function Programs() {
                         </div>
                         <div className="flex items-center gap-1.5 text-[14px] text-[#65676B]">
                           <CalendarDays className="w-3.5 h-3.5" />
-                          {program.startDate} — {program.endDate}
+                          {formatDateShort(program.startDate)} – {formatDateShort(program.endDate)}
                         </div>
-                        {program.status === "active" && (
-                          <Link href="/schedule">
-                            <Button variant="ghost" size="sm" className="gap-1 text-primary hover:bg-[#E7F3FF] font-semibold">
-                              View Schedule <ArrowRight className="w-3.5 h-3.5" />
-                            </Button>
-                          </Link>
-                        )}
+                        <div className="flex items-center gap-1.5 text-[14px] text-[#65676B]">
+                          <Clock className="w-3.5 h-3.5" />
+                          {program.daysOfWeek?.length ?? 0} days
+                        </div>
+                        <Link href="/schedule" onClick={() => setActiveWaveId(program.id)}>
+                          <Button variant="ghost" size="sm" className="gap-1 text-primary hover:bg-[#E7F3FF] font-semibold">
+                            View Schedule <ArrowRight className="w-3.5 h-3.5" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
 
-                    {/* Right: Quick stats for active program */}
-                    {program.status === "active" && (
-                      <div className="lg:w-64 shrink-0">
-                        <div className="p-4 bg-[#F0F2F5] rounded-xl space-y-3">
-                          <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide">
-                            Program Stats
-                          </p>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <p className="text-[24px] font-bold text-[#050505]">
-                                {schedule.length}
-                              </p>
-                              <p className="text-[12px] text-[#65676B]">Sessions</p>
-                            </div>
-                            <div>
-                              <p className="text-[24px] font-bold text-[#050505]">
-                                {new Set(schedule.map(s => s.sme).filter(s => s !== "N/A")).size}
-                              </p>
-                              <p className="text-[12px] text-[#65676B]">SMEs Assigned</p>
-                            </div>
-                            <div>
-                              <p className="text-[24px] font-bold text-[#050505]">
-                                {schedule.filter(s => s.type === "live").length}
-                              </p>
-                              <p className="text-[12px] text-[#65676B]">Live Sessions</p>
-                            </div>
-                            <div>
-                              <p className="text-[24px] font-bold text-[#050505]">4</p>
-                              <p className="text-[12px] text-[#65676B]">Training Days</p>
-                            </div>
+                    {/* Right: Quick stats */}
+                    <div className="lg:w-64 shrink-0">
+                      <div className="p-4 bg-[#F0F2F5] rounded-xl space-y-3">
+                        <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide">
+                          Wave Stats
+                        </p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-[24px] font-bold text-[#050505]">
+                              {waveSchedule.length}
+                            </p>
+                            <p className="text-[12px] text-[#65676B]">Sessions</p>
+                          </div>
+                          <div>
+                            <p className="text-[24px] font-bold text-[#050505]">
+                              {waveSMEs.size}
+                            </p>
+                            <p className="text-[12px] text-[#65676B]">SMEs</p>
+                          </div>
+                          <div>
+                            <p className="text-[24px] font-bold text-[#050505]">
+                              {liveSessions}
+                            </p>
+                            <p className="text-[12px] text-[#65676B]">Live</p>
+                          </div>
+                          <div>
+                            <p className="text-[24px] font-bold text-[#050505]">
+                              {program.daysOfWeek?.length ?? 0}
+                            </p>
+                            <p className="text-[12px] text-[#65676B]">Days</p>
+                          </div>
+                        </div>
+
+                        {/* Session type breakdown */}
+                        <div className="pt-3 border-t border-[#CED0D4]/40">
+                          <p className="text-[11px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Breakdown</p>
+                          <div className="space-y-1.5">
+                            {[
+                              { label: "Live Training", count: liveSessions, color: "bg-[#42B72A]" },
+                              { label: "Self Study", count: selfStudySessions, color: "bg-[#8A8D91]" },
+                              { label: "Upskilling", count: upskillingCount, color: "bg-primary" },
+                            ].map(item => (
+                              <div key={item.label} className="flex items-center gap-2">
+                                <div className={cn("w-2 h-2 rounded-full shrink-0", item.color)} />
+                                <span className="text-[12px] text-[#65676B] flex-1">{item.label}</span>
+                                <span className="text-[12px] font-semibold text-[#050505]">{item.count}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Training Modules Overview */}
-        <div className="mt-8">
-          <div className="meta-card">
-            <div className="p-4 border-b border-[#CED0D4]/60">
-              <div className="flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-primary" />
-                <h2 className="text-[20px] font-bold text-[#050505]">Training Modules</h2>
-              </div>
-              <p className="text-[14px] text-[#65676B] mt-1">
-                Overview of all training modules covered in the Wave 2 Complex Object Training program.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-x divide-y divide-[#CED0D4]/30">
-              {[
-                { module: "Live Video", day: "Monday", sme: "Farrukh Ahmed", type: "live" as const, desc: "Live video review training and self-study materials" },
-                { module: "Threads / Simple Objects", day: "Monday", sme: "Farrukh Ahmed", type: "upskilling" as const, desc: "Threads and simple objects module training" },
-                { module: "Groups", day: "Tuesday", sme: "Martin Wallin", type: "live" as const, desc: "Group review training with ops guidelines" },
-                { module: "Messenger", day: "Wednesday", sme: "Corneliu Onica", type: "upskilling" as const, desc: "Messenger IIC upskilling and self-study" },
-                { module: "Max Recall", day: "Thursday", sme: "Lukman Khiruddin", type: "live" as const, desc: "Max recall training and self-study session" },
-                { module: "Profile", day: "Thursday", sme: "Lukman Khiruddin", type: "live" as const, desc: "Profile review training and self-study" },
-              ].map((mod) => (
-                <div key={mod.module} className="p-4 hover:bg-[#F2F2F2] transition-colors duration-150">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-[15px] font-semibold text-[#050505]">{mod.module}</h3>
-                    <span className={cn(
-                      "meta-badge",
-                      mod.type === "live" ? "meta-badge-green" : "meta-badge-blue"
-                    )}>
-                      {mod.type === "live" ? "Live" : "Upskilling"}
-                    </span>
-                  </div>
-                  <p className="text-[13px] text-[#65676B] mb-3">{mod.desc}</p>
-                  <div className="flex items-center gap-3 text-[13px] text-[#8A8D91] pt-2 border-t border-[#CED0D4]/30">
-                    <span className="flex items-center gap-1">
-                      <CalendarDays className="w-3 h-3" />
-                      {mod.day}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users className="w-3 h-3" />
-                      {mod.sme}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Vendor Capacity Matrix */}
@@ -257,8 +284,11 @@ export default function Programs() {
             <div className="p-4 border-b border-[#CED0D4]/60">
               <div className="flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-primary" />
-                <h2 className="text-[20px] font-bold text-[#050505]">Vendor Capacity</h2>
+                <h2 className="text-[20px] font-bold text-[#050505]">Vendor Capacity Matrix</h2>
               </div>
+              <p className="text-[14px] text-[#65676B] mt-1">
+                SME distribution across vendors and locations.
+              </p>
             </div>
 
             <div className="overflow-x-auto">
