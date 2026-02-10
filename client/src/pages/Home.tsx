@@ -4,6 +4,7 @@
  * Inter font, spring animations, colored shadows, pill badges
  */
 import { Link } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { useData } from "@/contexts/DataContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import EditableField from "@/components/EditableField";
@@ -40,6 +41,10 @@ function formatDateShort(dateStr: string): string {
 }
 
 export default function Home() {
+  // The userAuth hooks provides authentication state
+  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
+  let { user, loading, error, isAuthenticated, logout } = useAuth();
+
   const { schedule, programs, smes, getScheduleForWave, updateProgram } = useData();
   const { isAdmin, logActivity } = useAdmin();
   const activeProgram = programs.find(p => p.status === "active");
@@ -73,7 +78,7 @@ export default function Home() {
                 />
               ) : (
                 <h1 className="text-[28px] md:text-[34px] font-bold text-foreground leading-[1.15] tracking-[-0.02em] mb-2">
-                  {activeProgram?.program || "Communication Hub"}
+                  {activeProgram?.program || "QER External Training Centre"}
                 </h1>
               )}
               {isAdmin && activeProgram ? (
@@ -86,11 +91,11 @@ export default function Home() {
                 />
               ) : (
                 <p className="text-[17px] text-muted-foreground mb-1.5">
-                  {activeProgram?.wave || "Vendor Training Management"}
+                  {activeProgram?.wave || "Meta Vendor Training Management"}
                 </p>
               )}
               <p className="text-[14px] text-muted-foreground/80 leading-relaxed mb-6 max-w-lg">
-                {activeProgram?.description?.slice(0, 140) || "Centralized communication platform for training schedules, SME coordination, and vendor management."}
+                {activeProgram?.description?.slice(0, 140) || "QER External Training Centre — Centralized communication platform for training schedules, SME coordination, and vendor management."}
               </p>
               <div className="flex flex-wrap items-center gap-2.5">
                 <Link href="/schedule">

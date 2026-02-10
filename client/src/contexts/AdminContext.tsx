@@ -1,28 +1,27 @@
 /*
- * Admin Context — User role management with admin/viewer modes
- * Design: Meta/Facebook — Clean, functional
- * Supports multiple admins, password-protected access, and activity logging
+ * Admin Context — Integrates with Manus OAuth for role-based access
+ * Admin users are determined by their database role (set via DB or owner auto-promotion)
+ * Activity logging and editing state management
  */
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 
 export interface AdminUser {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  role: "admin" | "viewer";
-  addedAt: string;
+  role: "admin" | "user";
+  openId: string;
 }
 
 interface AdminContextType {
   isAdmin: boolean;
+  isAuthenticated: boolean;
+  authLoading: boolean;
   currentUser: AdminUser | null;
-  adminUsers: AdminUser[];
   loginAsAdmin: (password: string) => boolean;
   logout: () => void;
-  addAdminUser: (user: Omit<AdminUser, "id" | "addedAt">) => void;
-  removeAdminUser: (id: string) => void;
-  updateAdminUser: (id: string, updates: Partial<AdminUser>) => void;
   editingField: string | null;
   setEditingField: (field: string | null) => void;
   activityLog: ActivityEntry[];
@@ -37,24 +36,50 @@ export interface ActivityEntry {
   detail: string;
 }
 
-const ADMIN_PASSWORD = "admin2025";
-
-const defaultAdmins: AdminUser[] = [
-  { id: "admin-1", name: "You (Owner)", email: "owner@comhub.io", role: "admin", addedAt: "2025-01-15" },
-];
+// Fallback password for local admin mode when not logged in via OAuth
+const LOCAL_ADMIN_PASSWORD = "admin2025";
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
-  const [adminUsers, setAdminUsers] = useState<AdminUser[]>(defaultAdmins);
+  const { user: authUser, loading: authLoading, isAuthenticated, logout: authLogout } = useAuth();
+
+  // Local admin mode fallback (for when OAuth is not used)
+  const [localAdminMode, setLocalAdminMode] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [activityLog, setActivityLog] = useState<ActivityEntry[]>([
     { id: "log-1", timestamp: "2025-02-10T09:00:00Z", user: "System", action: "Program Updated", detail: "Wave 2 training schedule published" },
     { id: "log-2", timestamp: "2025-02-10T08:30:00Z", user: "System", action: "SME Assigned", detail: "Farrukh Ahmed assigned to Live Video Training" },
     { id: "log-3", timestamp: "2025-02-09T16:00:00Z", user: "System", action: "Wave Created", detail: "Wave 3 — Advanced Review & Certification created" },
   ]);
+
+  // Determine admin status: OAuth user with admin role OR local admin mode
+  const isAdmin = useMemo(() => {
+    if (isAuthenticated && authUser && authUser.role === "admin") return true;
+    return localAdminMode;
+  }, [isAuthenticated, authUser, localAdminMode]);
+
+  const currentUser = useMemo((): AdminUser | null => {
+    if (isAuthenticated && authUser) {
+      return {
+        id: authUser.id,
+        name: authUser.name ?? "User",
+        email: authUser.email ?? "",
+        role: authUser.role as "admin" | "user",
+        openId: authUser.openId,
+      };
+    }
+    if (localAdminMode) {
+      return {
+        id: 0,
+        name: "Local Admin",
+        email: "admin@local",
+        role: "admin",
+        openId: "local",
+      };
+    }
+    return null;
+  }, [isAuthenticated, authUser, localAdminMode]);
 
   const logActivity = useCallback((action: string, detail: string) => {
     setActivityLog(prev => [
@@ -66,13 +91,20 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         detail,
       },
       ...prev,
-    ].slice(0, 50)); // Keep last 50 entries
+    ].slice(0, 50));
   }, [currentUser]);
 
+  // Login: If OAuth user is already admin, just confirm. Otherwise use local password.
   const loginAsAdmin = useCallback((password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      setCurrentUser(adminUsers[0]);
+    if (isAuthenticated && authUser && authUser.role === "admin") {
+      toast.success("Admin mode activated", {
+        description: "You're logged in as admin via your account.",
+        duration: 3000,
+      });
+      return true;
+    }
+    if (password === LOCAL_ADMIN_PASSWORD) {
+      setLocalAdminMode(true);
       toast.success("Admin mode activated", {
         description: "You can now edit all content directly on the website.",
         duration: 3000,
@@ -84,61 +116,34 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       duration: 3000,
     });
     return false;
-  }, [adminUsers]);
+  }, [isAuthenticated, authUser]);
 
   const logout = useCallback(() => {
-    setIsAdmin(false);
-    setCurrentUser(null);
-    setEditingField(null);
-    toast("Switched to Viewer mode", {
-      description: "View-only mode restored.",
-      duration: 2000,
-    });
-  }, []);
-
-  const addAdminUser = useCallback((user: Omit<AdminUser, "id" | "addedAt">) => {
-    const newUser: AdminUser = {
-      ...user,
-      id: `admin-${Date.now()}`,
-      addedAt: new Date().toISOString().split("T")[0],
-    };
-    setAdminUsers(prev => [...prev, newUser]);
-    logActivity("User Added", `${newUser.name} (${newUser.email}) added as ${newUser.role}`);
-    toast.success("User added", {
-      description: `${newUser.name} has been added as ${newUser.role}.`,
-    });
-  }, [logActivity]);
-
-  const removeAdminUser = useCallback((id: string) => {
-    if (id === "admin-1") {
-      toast.error("Cannot remove owner", { description: "The owner account cannot be removed." });
-      return;
+    if (localAdminMode) {
+      setLocalAdminMode(false);
+      setEditingField(null);
+      toast("Switched to Viewer mode", {
+        description: "View-only mode restored.",
+        duration: 2000,
+      });
+    } else if (isAuthenticated) {
+      authLogout();
+      setEditingField(null);
+      toast("Logged out", {
+        description: "You have been logged out.",
+        duration: 2000,
+      });
     }
-    setAdminUsers(prev => {
-      const user = prev.find(u => u.id === id);
-      if (user) {
-        logActivity("User Removed", `${user.name} (${user.email}) removed`);
-      }
-      return prev.filter(u => u.id !== id);
-    });
-    toast("User removed");
-  }, [logActivity]);
-
-  const updateAdminUser = useCallback((id: string, updates: Partial<AdminUser>) => {
-    setAdminUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
-    toast("User updated");
-  }, []);
+  }, [localAdminMode, isAuthenticated, authLogout]);
 
   return (
     <AdminContext.Provider value={{
       isAdmin,
+      isAuthenticated,
+      authLoading,
       currentUser,
-      adminUsers,
       loginAsAdmin,
       logout,
-      addAdminUser,
-      removeAdminUser,
-      updateAdminUser,
       editingField,
       setEditingField,
       activityLog,

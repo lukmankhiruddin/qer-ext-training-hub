@@ -12,8 +12,8 @@ import Directory from "./pages/Directory";
 import Programs from "./pages/Programs";
 import AdminPanel from "./pages/AdminPanel";
 import AppLayout from "./components/AppLayout";
-
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <AppLayout>
       <Switch>
@@ -40,7 +40,7 @@ function App() {
                 position="bottom-right"
                 toastOptions={{
                   style: {
-                    fontFamily: "'Segoe UI', Helvetica, Arial, sans-serif",
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
                   },
                 }}
               />

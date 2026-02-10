@@ -37,7 +37,7 @@ const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
 ];
 
 export default function AdminPanel() {
-  const { isAdmin, adminUsers, addAdminUser, removeAdminUser, updateAdminUser, activityLog, logActivity } = useAdmin();
+  const { isAdmin, currentUser, activityLog, logActivity } = useAdmin();
   const { programs, smes, contacts, allSchedules, addSession, deleteSession, updateSession, addProgram, deleteProgram, updateProgram, addSME, deleteSME, updateSME, addContact, deleteContact, updateContact, activeWaveId } = useData();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
@@ -109,10 +109,10 @@ export default function AdminPanel() {
           {/* Main Content */}
           <div className="flex-1 min-w-0 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
             {activeTab === "overview" && (
-              <OverviewTab totalSessions={totalSessions} totalPrograms={programs.length} totalSMEs={smes.length} totalContacts={contacts.length} totalUsers={adminUsers.length} recentActivity={activityLog.slice(0, 5)} onTabChange={setActiveTab} />
+              <OverviewTab totalSessions={totalSessions} totalPrograms={programs.length} totalSMEs={smes.length} totalContacts={contacts.length} totalUsers={1} recentActivity={activityLog.slice(0, 5)} onTabChange={setActiveTab} />
             )}
             {activeTab === "users" && (
-              <UsersTab users={adminUsers} onAdd={addAdminUser} onRemove={removeAdminUser} onUpdate={updateAdminUser} />
+              <UsersTab currentUser={currentUser} />
             )}
             {activeTab === "sessions" && (
               <SessionsTab allSchedules={allSchedules} programs={programs} activeWaveId={activeWaveId} onAdd={addSession} onDelete={(id) => { deleteSession(id); logActivity("Session Deleted", `Session ${id} removed`); }} onUpdate={(id, updates) => { updateSession(id, updates); logActivity("Session Updated", `Session ${id} updated`); }} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -206,77 +206,39 @@ function OverviewTab({ totalSessions, totalPrograms, totalSMEs, totalContacts, t
 }
 
 /* ============================================================ */
-function UsersTab({ users, onAdd, onRemove, onUpdate }: {
-  users: AdminUser[]; onAdd: (user: Omit<AdminUser, "id" | "addedAt">) => void;
-  onRemove: (id: string) => void; onUpdate: (id: string, updates: Partial<AdminUser>) => void;
-}) {
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ name: "", email: "", role: "admin" as "admin" | "viewer" });
-
-  const handleAdd = () => {
-    if (!newUser.name || !newUser.email) return;
-    onAdd(newUser); setNewUser({ name: "", email: "", role: "admin" }); setAddDialogOpen(false);
-  };
-
+function UsersTab({ currentUser }: { currentUser: AdminUser | null }) {
   return (
     <div className="space-y-4">
       <div className="glass-card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-[17px] font-bold text-foreground tracking-[-0.01em]">Users & Roles</h3>
-            <p className="text-[13px] text-muted-foreground mt-0.5">Manage who can edit the Communication Hub</p>
-          </div>
-          <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1.5 gradient-hero text-white font-semibold rounded-xl shadow-[0_2px_8px_oklch(0.55_0.22_264_/_20%)] border-0 hover:opacity-90 transition-all duration-300">
-                <UserPlus className="w-3.5 h-3.5" />Add User
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="rounded-2xl border-border/40 bg-white/95 backdrop-blur-xl shadow-[0_8px_40px_oklch(0.4_0.1_270_/_12%)] sm:max-w-[420px]">
-              <DialogHeader><DialogTitle className="text-[18px] font-bold text-foreground tracking-[-0.01em]">Add New User</DialogTitle></DialogHeader>
-              <div className="space-y-4 mt-3">
-                <div><Label className="text-[11px] text-muted-foreground mb-1.5 block font-semibold uppercase tracking-wider">Full Name</Label><Input value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} placeholder="e.g., John Smith" className="rounded-xl border-border/50" /></div>
-                <div><Label className="text-[11px] text-muted-foreground mb-1.5 block font-semibold uppercase tracking-wider">Email</Label><Input value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} placeholder="e.g., john@company.com" className="rounded-xl border-border/50" type="email" /></div>
-                <div><Label className="text-[11px] text-muted-foreground mb-1.5 block font-semibold uppercase tracking-wider">Role</Label>
-                  <Select value={newUser.role} onValueChange={v => setNewUser(p => ({ ...p, role: v as "admin" | "viewer" }))}>
-                    <SelectTrigger className="rounded-xl border-border/50"><SelectValue /></SelectTrigger>
-                    <SelectContent><SelectItem value="admin">Admin — Can edit everything</SelectItem><SelectItem value="viewer">Viewer — Read-only access</SelectItem></SelectContent>
-                  </Select>
-                </div>
-                <Button onClick={handleAdd} className="w-full gradient-hero text-white font-semibold rounded-xl shadow-[0_2px_8px_oklch(0.55_0.22_264_/_20%)] h-10 border-0 hover:opacity-90 transition-all duration-300" disabled={!newUser.name || !newUser.email}>Add User</Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+        <div className="mb-4">
+          <h3 className="text-[17px] font-bold text-foreground tracking-[-0.01em]">Users & Roles</h3>
+          <p className="text-[13px] text-muted-foreground mt-0.5">User access is managed through Manus OAuth authentication</p>
         </div>
 
-        <div className="space-y-2">
-          {users.map(user => (
-            <div key={user.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-all duration-200 group">
+        {/* Current User */}
+        {currentUser && (
+          <div className="space-y-2">
+            <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-[0.08em] mb-2">Current User</p>
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/15 to-purple-500/10 flex items-center justify-center shrink-0">
-                <span className="text-[12px] font-bold text-primary">{user.name.split(" ").map(n => n[0]).join("").slice(0, 2)}</span>
+                <span className="text-[12px] font-bold text-primary">{currentUser.name.split(" ").map(n => n[0]).join("").slice(0, 2)}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-[14px] font-semibold text-foreground">{user.name}</p>
-                  {user.id === "admin-1" && <span className="vibrant-badge vibrant-badge-amber">Owner</span>}
+                  <p className="text-[14px] font-semibold text-foreground">{currentUser.name}</p>
+                  {currentUser.role === "admin" && <span className="vibrant-badge vibrant-badge-amber">Owner</span>}
                 </div>
-                <p className="text-[12px] text-muted-foreground">{user.email}</p>
+                <p className="text-[12px] text-muted-foreground">{currentUser.email}</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className={cn("vibrant-badge", user.role === "admin" ? "vibrant-badge-blue" : "vibrant-badge-gray")}>
-                  {user.role === "admin" ? <Shield className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {user.role === "admin" ? "Admin" : "Viewer"}
+                <span className={cn("vibrant-badge", currentUser.role === "admin" ? "vibrant-badge-blue" : "vibrant-badge-gray")}>
+                  {currentUser.role === "admin" ? <Shield className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  {currentUser.role === "admin" ? "Admin" : "Viewer"}
                 </span>
-                {user.id !== "admin-1" && (
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <button onClick={() => onUpdate(user.id, { role: user.role === "admin" ? "viewer" : "admin" })} className="p-1.5 rounded-lg hover:bg-primary/8 text-muted-foreground hover:text-primary transition-all duration-200" title="Toggle role"><Edit3 className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => onRemove(user.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all duration-200" title="Remove user"><Trash2 className="w-3.5 h-3.5" /></button>
-                  </div>
-                )}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="glass-card p-4 bg-gradient-to-r from-primary/[0.03] to-purple-500/[0.03]">
@@ -285,8 +247,10 @@ function UsersTab({ users, onAdd, onRemove, onUpdate }: {
           <div>
             <p className="text-[13px] font-semibold text-foreground">About Roles</p>
             <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">
-              <strong>Admin</strong> users can edit all content directly on the website — sessions, programs, SME details, and contacts. They can also manage other users.
+              <strong>Admin</strong> users can edit all content directly on the website — sessions, programs, SME details, and contacts.
               <strong> Viewer</strong> users can only view the dashboard and schedules without making changes.
+              User roles are managed through the database. The project owner is automatically assigned the admin role.
+              To promote other users to admin, update their role in the Database panel.
             </p>
           </div>
         </div>
