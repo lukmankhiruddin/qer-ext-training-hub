@@ -1,7 +1,7 @@
 /*
- * Data Context — Centralized state management for all hub data
- * Supports multi-wave schedules with wave selection
- * Allows admin edits to propagate across all views
+ * Data Context — Centralized state management with full CRUD
+ * Supports multi-wave schedules, SME management, contact management
+ * All changes propagate across all views in real-time
  */
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import {
@@ -18,20 +18,33 @@ import {
 } from "@/lib/data";
 
 interface DataContextType {
-  // All wave schedules
+  // Schedules
   allSchedules: Record<string, TrainingSession[]>;
-  // Active wave schedule (currently selected)
   schedule: TrainingSession[];
   activeWaveId: string;
   setActiveWaveId: (id: string) => void;
   getScheduleForWave: (waveId: string) => TrainingSession[];
-  programs: ProgramItinerary[];
-  smes: SME[];
-  contacts: VendorContact[];
   updateSession: (id: string, updates: Partial<TrainingSession>) => void;
-  updateProgram: (id: string, updates: Partial<ProgramItinerary>) => void;
   addSession: (session: TrainingSession) => void;
   deleteSession: (id: string) => void;
+
+  // Programs
+  programs: ProgramItinerary[];
+  updateProgram: (id: string, updates: Partial<ProgramItinerary>) => void;
+  addProgram: (program: ProgramItinerary) => void;
+  deleteProgram: (id: string) => void;
+
+  // SMEs
+  smes: SME[];
+  addSME: (sme: SME) => void;
+  updateSME: (id: string, updates: Partial<SME>) => void;
+  deleteSME: (id: string) => void;
+
+  // Contacts
+  contacts: VendorContact[];
+  addContact: (contact: VendorContact) => void;
+  updateContact: (id: string, updates: Partial<VendorContact>) => void;
+  deleteContact: (id: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -42,10 +55,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     "prog-2": [...wave2Schedule],
     "prog-3": [...wave3Schedule],
   });
-  const [activeWaveId, setActiveWaveId] = useState("prog-2"); // Wave 2 is active
+  const [activeWaveId, setActiveWaveId] = useState("prog-2");
   const [programs, setPrograms] = useState<ProgramItinerary[]>(initialPrograms);
-  const [smes] = useState<SME[]>(initialSMEs);
-  const [contacts] = useState<VendorContact[]>(initialContacts);
+  const [smes, setSMEs] = useState<SME[]>(initialSMEs);
+  const [contacts, setContacts] = useState<VendorContact[]>(initialContacts);
 
   const schedule = allSchedules[activeWaveId] ?? [];
 
@@ -53,6 +66,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return allSchedules[waveId] ?? [];
   }, [allSchedules]);
 
+  // Session CRUD
   const updateSession = useCallback((id: string, updates: Partial<TrainingSession>) => {
     setAllSchedules(prev => {
       const newSchedules = { ...prev };
@@ -63,10 +77,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       }
       return newSchedules;
     });
-  }, []);
-
-  const updateProgram = useCallback((id: string, updates: Partial<ProgramItinerary>) => {
-    setPrograms(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
   }, []);
 
   const addSession = useCallback((session: TrainingSession) => {
@@ -87,6 +97,51 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  // Program CRUD
+  const updateProgram = useCallback((id: string, updates: Partial<ProgramItinerary>) => {
+    setPrograms(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+  }, []);
+
+  const addProgram = useCallback((program: ProgramItinerary) => {
+    setPrograms(prev => [...prev, program]);
+    setAllSchedules(prev => ({ ...prev, [program.id]: [] }));
+  }, []);
+
+  const deleteProgram = useCallback((id: string) => {
+    setPrograms(prev => prev.filter(p => p.id !== id));
+    setAllSchedules(prev => {
+      const newSchedules = { ...prev };
+      delete newSchedules[id];
+      return newSchedules;
+    });
+  }, []);
+
+  // SME CRUD
+  const addSME = useCallback((sme: SME) => {
+    setSMEs(prev => [...prev, sme]);
+  }, []);
+
+  const updateSME = useCallback((id: string, updates: Partial<SME>) => {
+    setSMEs(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+  }, []);
+
+  const deleteSME = useCallback((id: string) => {
+    setSMEs(prev => prev.filter(s => s.id !== id));
+  }, []);
+
+  // Contact CRUD
+  const addContact = useCallback((contact: VendorContact) => {
+    setContacts(prev => [...prev, contact]);
+  }, []);
+
+  const updateContact = useCallback((id: string, updates: Partial<VendorContact>) => {
+    setContacts(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+  }, []);
+
+  const deleteContact = useCallback((id: string) => {
+    setContacts(prev => prev.filter(c => c.id !== id));
+  }, []);
+
   return (
     <DataContext.Provider value={{
       allSchedules,
@@ -94,13 +149,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
       activeWaveId,
       setActiveWaveId,
       getScheduleForWave,
-      programs,
-      smes,
-      contacts,
       updateSession,
-      updateProgram,
       addSession,
       deleteSession,
+      programs,
+      updateProgram,
+      addProgram,
+      deleteProgram,
+      smes,
+      addSME,
+      updateSME,
+      deleteSME,
+      contacts,
+      addContact,
+      updateContact,
+      deleteContact,
     }}>
       {children}
     </DataContext.Provider>

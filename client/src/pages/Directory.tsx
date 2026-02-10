@@ -1,10 +1,11 @@
 /*
- * Directory — SME Directory with search, filter, and capacity overview
+ * Directory — SME Directory with search, filter, capacity overview, and admin CRUD
  * Design: Meta/Facebook — Circular avatars, white cards, blue hover states
- * 44 real SMEs from QERName.xlsx
+ * Admin mode: Add/Edit/Remove SMEs and contacts directly
  */
 import { useState, useMemo } from "react";
 import { useData } from "@/contexts/DataContext";
+import { useAdmin } from "@/contexts/AdminContext";
 import {
   Search,
   X,
@@ -12,8 +13,16 @@ import {
   Users,
   Globe,
   Building2,
+  UserPlus,
+  Trash2,
+  Edit3,
+  Plus,
+  Phone,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -26,18 +35,24 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import type { SME } from "@/lib/data";
+import { toast } from "sonner";
+import type { SME, VendorContact } from "@/lib/data";
 
 export default function Directory() {
-  const { smes, contacts } = useData();
+  const { smes, contacts, addSME, deleteSME, addContact, deleteContact } = useData();
+  const { isAdmin, logActivity } = useAdmin();
   const [search, setSearch] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedSME, setSelectedSME] = useState<SME | null>(null);
+  const [addSMEOpen, setAddSMEOpen] = useState(false);
+  const [addContactOpen, setAddContactOpen] = useState(false);
+  const [newSME, setNewSME] = useState({ name: "", market: "", location: "Dublin", space: "Simple Object", roles: "Market SME" });
+  const [newContact, setNewContact] = useState({ name: "", role: "", vendor: "", email: "", phone: "" });
 
-  // Unique locations and roles
   const locations = useMemo(() => {
     const locs = new Set(smes.map(s => s.location).filter(Boolean));
     return Array.from(locs).sort();
@@ -53,7 +68,6 @@ export default function Directory() {
     return Array.from(m).sort();
   }, [smes]);
 
-  // Filtered SMEs
   const filtered = useMemo(() => {
     return smes.filter(s => {
       const matchSearch =
@@ -67,17 +81,9 @@ export default function Directory() {
     });
   }, [smes, search, locationFilter, roleFilter]);
 
-  // Get initials for avatar
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map(n => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
+  const getInitials = (name: string) =>
+    name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
 
-  // Generate consistent color from name — Meta style colors
   const getAvatarColor = (name: string) => {
     const colors = [
       "bg-[#E7F3FF] text-primary",
@@ -93,9 +99,52 @@ export default function Directory() {
     return colors[index];
   };
 
+  const handleAddSME = () => {
+    const sme: SME = {
+      id: `sme-${Date.now()}`,
+      name: newSME.name,
+      market: newSME.market,
+      vendors: [],
+      roles: newSME.roles.split(",").map(r => r.trim()).filter(Boolean),
+      policySME: "",
+      space: newSME.space,
+      location: newSME.location,
+    };
+    addSME(sme);
+    logActivity("SME Added", `${sme.name} added to directory`);
+    setAddSMEOpen(false);
+    setNewSME({ name: "", market: "", location: "Dublin", space: "Simple Object", roles: "Market SME" });
+    toast.success("SME added to directory");
+  };
+
+  const handleDeleteSME = (sme: SME, e: React.MouseEvent) => {
+    e.stopPropagation();
+    deleteSME(sme.id);
+    logActivity("SME Removed", `${sme.name} removed from directory`);
+    toast("SME removed");
+  };
+
+  const handleAddContact = () => {
+    const contact: VendorContact = {
+      id: `vc-${Date.now()}`,
+      name: newContact.name,
+      vendor: newContact.vendor,
+      location: "Dublin",
+      primaryContact: newContact.role,
+      email: newContact.email,
+      phone: newContact.phone,
+      role: newContact.role,
+    };
+    addContact(contact);
+    logActivity("Contact Added", `${contact.name} added as vendor contact`);
+    setAddContactOpen(false);
+    setNewContact({ name: "", role: "", vendor: "", email: "", phone: "" });
+    toast.success("Contact added");
+  };
+
   return (
     <div className="bg-[#F0F2F5] min-h-screen">
-      {/* Header — Meta style: white banner */}
+      {/* Header */}
       <div className="bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
         <div className="container py-5">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
@@ -114,8 +163,7 @@ export default function Directory() {
               </p>
             </div>
 
-            {/* Capacity summary — Meta style */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-end">
               {locations.map(loc => {
                 const count = smes.filter(s => s.location === loc).length;
                 return (
@@ -136,7 +184,7 @@ export default function Directory() {
       </div>
 
       <div className="container py-4">
-        {/* Filters — Meta style */}
+        {/* Filters */}
         <div className="meta-card p-4 mb-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div className="relative flex-1 w-full sm:max-w-sm">
@@ -178,44 +226,106 @@ export default function Directory() {
               </SelectContent>
             </Select>
 
-            <span className="text-[13px] text-[#8A8D91] font-medium ml-auto">
+            <span className="text-[13px] text-[#8A8D91] font-medium">
               {filtered.length} result{filtered.length !== 1 ? "s" : ""}
             </span>
+
+            {/* Admin: Add SME */}
+            {isAdmin && (
+              <Dialog open={addSMEOpen} onOpenChange={setAddSMEOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none ml-auto">
+                    <UserPlus className="w-3.5 h-3.5" />
+                    Add SME
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="rounded-xl sm:max-w-[420px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-[20px] font-bold text-[#050505]">Add Subject Matter Expert</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Full Name</Label>
+                      <Input value={newSME.name} onChange={e => setNewSME(p => ({ ...p, name: e.target.value }))} placeholder="e.g., John Smith" className="rounded-lg" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Market</Label>
+                        <Input value={newSME.market} onChange={e => setNewSME(p => ({ ...p, market: e.target.value }))} placeholder="e.g., Arabic" className="rounded-lg" />
+                      </div>
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Location</Label>
+                        <Select value={newSME.location} onValueChange={v => setNewSME(p => ({ ...p, location: v }))}>
+                          <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Dublin">Dublin</SelectItem>
+                            <SelectItem value="Bangkok">Bangkok</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Space</Label>
+                      <Select value={newSME.space} onValueChange={v => setNewSME(p => ({ ...p, space: v }))}>
+                        <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Simple Object">Simple Object</SelectItem>
+                          <SelectItem value="Complex Object">Complex Object</SelectItem>
+                          <SelectItem value="Simple Object & Complex Object">Simple & Complex Object</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Roles (comma-separated)</Label>
+                      <Input value={newSME.roles} onChange={e => setNewSME(p => ({ ...p, roles: e.target.value }))} placeholder="Market SME, VG SME" className="rounded-lg" />
+                    </div>
+                    <Button onClick={handleAddSME} className="w-full bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none h-10" disabled={!newSME.name || !newSME.market}>
+                      Add SME
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
 
-        {/* SME Grid — Meta style: Facebook people cards */}
+        {/* SME Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {filtered.map((sme) => (
             <div
               key={sme.id}
-              className="meta-card hover:shadow-[0_2px_4px_rgba(0,0,0,0.1),0_8px_16px_rgba(0,0,0,0.1)] transition-shadow duration-200 cursor-pointer group"
+              className="meta-card hover:shadow-[0_2px_4px_rgba(0,0,0,0.1),0_8px_16px_rgba(0,0,0,0.1)] transition-shadow duration-200 cursor-pointer group relative"
               onClick={() => setSelectedSME(sme)}
             >
+              {/* Admin: Delete button */}
+              {isAdmin && (
+                <button
+                  onClick={(e) => handleDeleteSME(sme, e)}
+                  className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[#65676B] hover:text-[#FA3E3E] transition-all duration-150 z-10"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+
               <div className="p-4">
                 <div className="flex items-start gap-3">
-                  {/* Avatar — Meta style: circular */}
                   <div className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0",
                     getAvatarColor(sme.name)
                   )}>
                     {getInitials(sme.name)}
                   </div>
-
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[15px] font-semibold text-[#050505] truncate group-hover:text-primary transition-colors duration-150">
                       {sme.name}
                     </h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <Globe className="w-3 h-3 text-[#8A8D91]" />
-                      <span className="text-[13px] text-[#65676B] truncate">
-                        {sme.market}
-                      </span>
+                      <span className="text-[13px] text-[#65676B] truncate">{sme.market}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Roles — Meta style badges */}
                 <div className="flex flex-wrap gap-1 mt-3">
                   {sme.roles.slice(0, 3).map(role => {
                     const roleClass = role === "Pillar Lead SME"
@@ -226,20 +336,13 @@ export default function Directory() {
                       ? "bg-[#E7F3FF] text-primary"
                       : "bg-[#F0F2F5] text-[#65676B]";
                     return (
-                      <span
-                        key={role}
-                        className={cn(
-                          "px-2 py-0.5 rounded text-[11px] font-semibold",
-                          roleClass
-                        )}
-                      >
+                      <span key={role} className={cn("px-2 py-0.5 rounded text-[11px] font-semibold", roleClass)}>
                         {role}
                       </span>
                     );
                   })}
                 </div>
 
-                {/* Location */}
                 <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-[#CED0D4]/40">
                   <MapPin className="w-3 h-3 text-[#8A8D91]" />
                   <span className="text-[12px] text-[#65676B]">{sme.location || "—"}</span>
@@ -254,7 +357,7 @@ export default function Directory() {
           ))}
         </div>
 
-        {/* SME Detail Dialog — Meta style */}
+        {/* SME Detail Dialog */}
         <Dialog open={!!selectedSME} onOpenChange={open => !open && setSelectedSME(null)}>
           <DialogContent className="max-w-md rounded-xl">
             {selectedSME && (
@@ -275,7 +378,6 @@ export default function Directory() {
                 </DialogHeader>
 
                 <div className="space-y-4 mt-2">
-                  {/* Roles */}
                   <div>
                     <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Roles</p>
                     <div className="flex flex-wrap gap-1.5">
@@ -287,7 +389,6 @@ export default function Directory() {
                     </div>
                   </div>
 
-                  {/* Vendors */}
                   <div>
                     <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Vendors</p>
                     <div className="space-y-1.5">
@@ -303,7 +404,6 @@ export default function Directory() {
                     </div>
                   </div>
 
-                  {/* Policy SME */}
                   {selectedSME.policySME && (
                     <div>
                       <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Policy Expertise</p>
@@ -317,13 +417,11 @@ export default function Directory() {
                     </div>
                   )}
 
-                  {/* Space */}
                   <div>
                     <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Space</p>
                     <p className="text-[14px] text-[#050505]">{selectedSME.space}</p>
                   </div>
 
-                  {/* Location */}
                   <div>
                     <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Location</p>
                     <div className="flex items-center gap-2 text-[14px] text-[#050505]">
@@ -341,22 +439,84 @@ export default function Directory() {
         <div className="mt-8">
           <div className="meta-card">
             <div className="p-4 border-b border-[#CED0D4]/60">
-              <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-primary" />
-                <h2 className="text-[20px] font-bold text-[#050505]">Vendor Contacts</h2>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-primary" />
+                  <h2 className="text-[20px] font-bold text-[#050505]">Vendor Contacts</h2>
+                </div>
+                {isAdmin && (
+                  <Dialog open={addContactOpen} onOpenChange={setAddContactOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="gap-1.5 bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none">
+                        <Plus className="w-3.5 h-3.5" />
+                        Add Contact
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="rounded-xl sm:max-w-[420px]">
+                      <DialogHeader>
+                        <DialogTitle className="text-[20px] font-bold text-[#050505]">Add Vendor Contact</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 mt-4">
+                        <div>
+                          <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Full Name</Label>
+                          <Input value={newContact.name} onChange={e => setNewContact(p => ({ ...p, name: e.target.value }))} className="rounded-lg" />
+                        </div>
+                        <div>
+                          <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Role / Title</Label>
+                          <Input value={newContact.role} onChange={e => setNewContact(p => ({ ...p, role: e.target.value }))} placeholder="e.g., Training Manager" className="rounded-lg" />
+                        </div>
+                        <div>
+                          <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Vendor</Label>
+                          <Input value={newContact.vendor} onChange={e => setNewContact(p => ({ ...p, vendor: e.target.value }))} placeholder="e.g., Teleperformance" className="rounded-lg" />
+                        </div>
+                        <div>
+                          <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Email</Label>
+                          <Input value={newContact.email} onChange={e => setNewContact(p => ({ ...p, email: e.target.value }))} type="email" className="rounded-lg" />
+                        </div>
+                        <div>
+                          <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Phone</Label>
+                          <Input value={newContact.phone} onChange={e => setNewContact(p => ({ ...p, phone: e.target.value }))} className="rounded-lg" />
+                        </div>
+                        <Button onClick={handleAddContact} className="w-full bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none h-10" disabled={!newContact.name}>
+                          Add Contact
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-x divide-[#CED0D4]/40">
               {contacts.map(contact => (
-                <div key={contact.id} className="p-4">
+                <div key={contact.id} className="p-4 relative group">
+                  {isAdmin && (
+                    <button
+                      onClick={() => { deleteContact(contact.id); logActivity("Contact Removed", `${contact.name} removed`); toast("Contact removed"); }}
+                      className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[#65676B] hover:text-[#FA3E3E] transition-all duration-150"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-full bg-[#E7F3FF] flex items-center justify-center">
                       <Building2 className="w-4 h-4 text-primary" />
                     </div>
                     <h3 className="text-[15px] font-semibold text-[#050505]">{contact.vendor}</h3>
                   </div>
-                  <p className="text-[14px] text-[#050505] mb-0.5">{contact.primaryContact}</p>
+                  <p className="text-[14px] font-medium text-[#050505] mb-0.5">{contact.name}</p>
                   <p className="text-[13px] text-[#65676B]">{contact.role}</p>
+                  {contact.email && (
+                    <div className="flex items-center gap-1.5 mt-2 text-[13px] text-primary">
+                      <Mail className="w-3 h-3" />
+                      {contact.email}
+                    </div>
+                  )}
+                  {contact.phone && (
+                    <div className="flex items-center gap-1.5 mt-1 text-[13px] text-[#65676B]">
+                      <Phone className="w-3 h-3" />
+                      {contact.phone}
+                    </div>
+                  )}
                   <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-[#CED0D4]/30">
                     <MapPin className="w-3 h-3 text-[#8A8D91]" />
                     <span className="text-[12px] text-[#65676B]">{contact.location}</span>

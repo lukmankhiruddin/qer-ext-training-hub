@@ -218,18 +218,20 @@ export function getScheduleByWaveId(waveId: string): TrainingSession[] {
 // ============================================================
 export interface VendorContact {
   id: string;
+  name: string;
   vendor: string;
   location: string;
   primaryContact: string;
   email: string;
+  phone: string;
   role: string;
 }
 
 export const vendorContacts: VendorContact[] = [
-  { id: "vc-1", vendor: "Accenture", location: "Dublin", primaryContact: "Operations Manager", email: "ops.dublin@accenture.com", role: "Vendor Operations" },
-  { id: "vc-2", vendor: "Teleperformance", location: "Dublin", primaryContact: "Training Coordinator", email: "training@teleperformance.com", role: "Training Delivery" },
-  { id: "vc-3", vendor: "Covalen", location: "Dublin", primaryContact: "Site Manager", email: "site.mgr@covalen.com", role: "Site Operations" },
-  { id: "vc-4", vendor: "Accenture", location: "Bangkok", primaryContact: "Regional Lead", email: "regional.bkk@accenture.com", role: "Regional Operations" },
+  { id: "vc-1", name: "Sarah Mitchell", vendor: "Accenture", location: "Dublin", primaryContact: "Operations Manager", email: "ops.dublin@accenture.com", phone: "+353 1 234 5678", role: "Vendor Operations" },
+  { id: "vc-2", name: "James O'Brien", vendor: "Teleperformance", location: "Dublin", primaryContact: "Training Coordinator", email: "training@teleperformance.com", phone: "+353 1 345 6789", role: "Training Delivery" },
+  { id: "vc-3", name: "Emma Walsh", vendor: "Covalen", location: "Dublin", primaryContact: "Site Manager", email: "site.mgr@covalen.com", phone: "+353 1 456 7890", role: "Site Operations" },
+  { id: "vc-4", name: "Priya Sharma", vendor: "Accenture", location: "Bangkok", primaryContact: "Regional Lead", email: "regional.bkk@accenture.com", phone: "+66 2 123 4567", role: "Regional Operations" },
 ];
 
 // ============================================================

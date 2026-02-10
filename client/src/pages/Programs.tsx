@@ -2,8 +2,9 @@
  * Programs — Program Itinerary Management with Wave 1/2/3
  * Design: Meta/Facebook — Clean white cards, blue accents, system fonts
  * Shows all waves with their schedules, modules, and SME assignments
- * Admin can edit program details inline
+ * Admin can add/edit/delete programs and manage modules inline
  */
+import { useState } from "react";
 import { useData } from "@/contexts/DataContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import EditableField from "@/components/EditableField";
@@ -20,11 +21,31 @@ import {
   BookOpen,
   Clock,
   AlertCircle,
+  Plus,
+  Trash2,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
-import { getSessionTypeBadge, getStatusBadge } from "@/lib/data";
+import { getSessionTypeBadge, getStatusBadge, type ProgramItinerary } from "@/lib/data";
+import { toast } from "sonner";
 
 function formatDateShort(dateStr: string): string {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -36,8 +57,47 @@ function formatDateShort(dateStr: string): string {
 }
 
 export default function Programs() {
-  const { programs, smes, schedule, contacts, updateProgram, getScheduleForWave, setActiveWaveId } = useData();
-  const { isAdmin } = useAdmin();
+  const { programs, smes, schedule, contacts, updateProgram, deleteProgram, addProgram, getScheduleForWave, setActiveWaveId } = useData();
+  const { isAdmin, logActivity } = useAdmin();
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newProg, setNewProg] = useState({
+    program: "TP Onboarding Schedule",
+    wave: "",
+    location: "Dublin",
+    startDate: "",
+    endDate: "",
+    status: "upcoming" as ProgramItinerary["status"],
+    description: "",
+    modules: "",
+    smes: "",
+  });
+
+  const handleAddProgram = () => {
+    const prog: ProgramItinerary = {
+      id: `prog-${Date.now()}`,
+      program: newProg.program,
+      wave: newProg.wave,
+      location: newProg.location,
+      startDate: newProg.startDate,
+      endDate: newProg.endDate,
+      status: newProg.status,
+      description: newProg.description,
+      modules: newProg.modules.split(",").map(m => m.trim()).filter(Boolean),
+      smesInvolved: newProg.smes.split(",").map(s => s.trim()).filter(Boolean),
+      daysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    };
+    addProgram(prog);
+    logActivity("Program Added", `${prog.wave} created`);
+    setAddDialogOpen(false);
+    setNewProg({ program: "TP Onboarding Schedule", wave: "", location: "Dublin", startDate: "", endDate: "", status: "upcoming", description: "", modules: "", smes: "" });
+    toast.success("Program added");
+  };
+
+  const handleDeleteProgram = (prog: ProgramItinerary) => {
+    deleteProgram(prog.id);
+    logActivity("Program Deleted", `${prog.wave} removed`);
+    toast("Program removed");
+  };
 
   const statusConfig = {
     active: {
@@ -68,18 +128,97 @@ export default function Programs() {
       {/* Header */}
       <div className="bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
         <div className="container py-5">
-          <div className="flex items-center gap-2 mb-1">
-            <FolderKanban className="w-4 h-4 text-primary" />
-            <span className="text-[13px] font-semibold text-primary uppercase tracking-wide">
-              Program Itinerary
-            </span>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <FolderKanban className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-semibold text-primary uppercase tracking-wide">
+                  Program Itinerary
+                </span>
+              </div>
+              <h1 className="text-[24px] font-bold text-[#050505] mb-1">
+                Training Programs
+              </h1>
+              <p className="text-[15px] text-[#65676B] max-w-lg">
+                Track all training waves — past, current, and upcoming. View schedules, SME assignments, and program status at a glance.
+              </p>
+            </div>
+
+            {/* Admin: Add Program */}
+            {isAdmin && (
+              <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none">
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Program
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="rounded-xl sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-[20px] font-bold text-[#050505]">Add Training Program</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto pr-1">
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Program Name</Label>
+                      <Input value={newProg.program} onChange={e => setNewProg(p => ({ ...p, program: e.target.value }))} className="rounded-lg" />
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Wave Title</Label>
+                      <Input value={newProg.wave} onChange={e => setNewProg(p => ({ ...p, wave: e.target.value }))} placeholder="e.g., Wave 4 — Quality Assurance" className="rounded-lg" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Start Date</Label>
+                        <Input type="date" value={newProg.startDate} onChange={e => setNewProg(p => ({ ...p, startDate: e.target.value }))} className="rounded-lg" />
+                      </div>
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">End Date</Label>
+                        <Input type="date" value={newProg.endDate} onChange={e => setNewProg(p => ({ ...p, endDate: e.target.value }))} className="rounded-lg" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Location</Label>
+                        <Input value={newProg.location} onChange={e => setNewProg(p => ({ ...p, location: e.target.value }))} className="rounded-lg" />
+                      </div>
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Status</Label>
+                        <Select value={newProg.status} onValueChange={v => setNewProg(p => ({ ...p, status: v as ProgramItinerary["status"] }))}>
+                          <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="upcoming">Upcoming</SelectItem>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Description</Label>
+                      <textarea
+                        value={newProg.description}
+                        onChange={e => setNewProg(p => ({ ...p, description: e.target.value }))}
+                        className="w-full bg-white border border-input rounded-lg px-3 py-2 text-[14px] text-[#050505] focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                        rows={3}
+                        placeholder="Brief description of the program..."
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Modules (comma-separated)</Label>
+                      <Input value={newProg.modules} onChange={e => setNewProg(p => ({ ...p, modules: e.target.value }))} placeholder="e.g., Video Review, Photo Moderation" className="rounded-lg" />
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">SMEs Involved (comma-separated)</Label>
+                      <Input value={newProg.smes} onChange={e => setNewProg(p => ({ ...p, smes: e.target.value }))} placeholder="e.g., Farrukh Ahmed, Corneliu Onica" className="rounded-lg" />
+                    </div>
+                    <Button onClick={handleAddProgram} className="w-full bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none h-10" disabled={!newProg.wave || !newProg.startDate}>
+                      Add Program
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
-          <h1 className="text-[24px] font-bold text-[#050505] mb-1">
-            Training Programs
-          </h1>
-          <p className="text-[15px] text-[#65676B] max-w-lg">
-            Track all training waves — past, current, and upcoming. View schedules, SME assignments, and program status at a glance.
-          </p>
         </div>
       </div>
 
@@ -98,12 +237,23 @@ export default function Programs() {
               <div
                 key={program.id}
                 className={cn(
-                  "meta-card overflow-hidden transition-shadow duration-200",
+                  "meta-card overflow-hidden transition-shadow duration-200 relative group",
                   program.status === "active" && "shadow-[0_2px_4px_rgba(0,0,0,0.1),0_8px_16px_rgba(0,0,0,0.1)]"
                 )}
               >
                 {/* Status bar */}
                 <div className={cn("h-[3px]", status.barColor)} />
+
+                {/* Admin: Delete program */}
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeleteProgram(program)}
+                    className="absolute top-4 right-4 p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[#65676B] hover:text-[#FA3E3E] transition-all duration-150 z-10"
+                    title="Delete program"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
 
                 <div className="p-5 md:p-6">
                   <div className="flex flex-col lg:flex-row lg:items-start gap-5">
@@ -129,7 +279,7 @@ export default function Programs() {
                         <EditableField
                           value={program.program}
                           fieldId={`program-${program.id}-name`}
-                          onSave={v => updateProgram(program.id, { program: v })}
+                          onSave={v => { updateProgram(program.id, { program: v }); logActivity("Program Updated", `${program.wave} name changed`); }}
                           className="text-[22px] font-bold text-[#050505] block mb-1"
                           as="h2"
                         />
@@ -143,7 +293,7 @@ export default function Programs() {
                         <EditableField
                           value={program.wave}
                           fieldId={`program-${program.id}-wave`}
-                          onSave={v => updateProgram(program.id, { wave: v })}
+                          onSave={v => { updateProgram(program.id, { wave: v }); logActivity("Program Updated", `Wave title changed to ${v}`); }}
                           className="text-[15px] text-[#65676B] block mb-3"
                           as="p"
                         />
@@ -155,7 +305,7 @@ export default function Programs() {
                         <EditableField
                           value={program.description}
                           fieldId={`program-${program.id}-desc`}
-                          onSave={v => updateProgram(program.id, { description: v })}
+                          onSave={v => { updateProgram(program.id, { description: v }); logActivity("Program Updated", `${program.wave} description updated`); }}
                           className="text-[14px] text-[#8A8D91] leading-relaxed block"
                           as="p"
                           multiline
@@ -172,10 +322,33 @@ export default function Programs() {
                           <p className="text-[11px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Training Modules</p>
                           <div className="flex flex-wrap gap-1.5">
                             {program.modules.map((mod, mi) => (
-                              <span key={mi} className="text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#F0F2F5] text-[#65676B]">
+                              <span key={mi} className="text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#F0F2F5] text-[#65676B] flex items-center gap-1">
                                 {mod}
+                                {isAdmin && (
+                                  <button
+                                    onClick={() => {
+                                      const newModules = program.modules!.filter((_, i) => i !== mi);
+                                      updateProgram(program.id, { modules: newModules });
+                                      logActivity("Module Removed", `${mod} removed from ${program.wave}`);
+                                      toast("Module removed");
+                                    }}
+                                    className="ml-0.5 text-[#8A8D91] hover:text-[#FA3E3E] transition-colors"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                )}
                               </span>
                             ))}
+                            {isAdmin && (
+                              <AddModuleInline
+                                onAdd={(mod) => {
+                                  const newModules = [...(program.modules ?? []), mod];
+                                  updateProgram(program.id, { modules: newModules });
+                                  logActivity("Module Added", `${mod} added to ${program.wave}`);
+                                  toast.success("Module added");
+                                }}
+                              />
+                            )}
                           </div>
                         </div>
                       )}
@@ -191,8 +364,31 @@ export default function Programs() {
                                   {sme.split(" ").map(n => n[0]).join("").slice(0, 2)}
                                 </span>
                                 {sme}
+                                {isAdmin && (
+                                  <button
+                                    onClick={() => {
+                                      const newSMEs = program.smesInvolved!.filter((_, i) => i !== si);
+                                      updateProgram(program.id, { smesInvolved: newSMEs });
+                                      logActivity("SME Unassigned", `${sme} removed from ${program.wave}`);
+                                      toast("SME unassigned");
+                                    }}
+                                    className="ml-0.5 text-primary/60 hover:text-[#FA3E3E] transition-colors"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                )}
                               </span>
                             ))}
+                            {isAdmin && (
+                              <AddSMEInline
+                                onAdd={(sme) => {
+                                  const newSMEs = [...(program.smesInvolved ?? []), sme];
+                                  updateProgram(program.id, { smesInvolved: newSMEs });
+                                  logActivity("SME Assigned", `${sme} assigned to ${program.wave}`);
+                                  toast.success("SME assigned");
+                                }}
+                              />
+                            )}
                           </div>
                         </div>
                       )}
@@ -344,6 +540,90 @@ export default function Programs() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ============================================================
+ * Inline Add Module Button
+ * ============================================================ */
+function AddModuleInline({ onAdd }: { onAdd: (mod: string) => void }) {
+  const [isAdding, setIsAdding] = useState(false);
+  const [value, setValue] = useState("");
+
+  if (!isAdding) {
+    return (
+      <button
+        onClick={() => setIsAdding(true)}
+        className="inline-flex items-center gap-1 text-[12px] font-medium px-2.5 py-1 rounded-full border-2 border-dashed border-[#CED0D4] text-[#8A8D91] hover:border-primary hover:text-primary transition-colors duration-150"
+      >
+        <Plus className="w-3 h-3" />
+        Add Module
+      </button>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1">
+      <input
+        autoFocus
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === "Enter" && value.trim()) { onAdd(value.trim()); setValue(""); setIsAdding(false); }
+          if (e.key === "Escape") { setValue(""); setIsAdding(false); }
+        }}
+        placeholder="Module name..."
+        className="text-[12px] px-2 py-1 rounded-lg border-2 border-primary bg-white focus:outline-none shadow-[0_0_0_2px_rgba(24,119,242,0.2)] min-w-[120px]"
+      />
+      <button onClick={() => { if (value.trim()) { onAdd(value.trim()); setValue(""); setIsAdding(false); } }} className="p-1 text-primary hover:bg-[#E7F3FF] rounded">
+        <CheckCircle2 className="w-4 h-4" />
+      </button>
+      <button onClick={() => { setValue(""); setIsAdding(false); }} className="p-1 text-[#8A8D91] hover:bg-[#F0F2F5] rounded">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
+/* ============================================================
+ * Inline Add SME Button
+ * ============================================================ */
+function AddSMEInline({ onAdd }: { onAdd: (sme: string) => void }) {
+  const [isAdding, setIsAdding] = useState(false);
+  const [value, setValue] = useState("");
+
+  if (!isAdding) {
+    return (
+      <button
+        onClick={() => setIsAdding(true)}
+        className="inline-flex items-center gap-1 text-[12px] font-medium px-2.5 py-1 rounded-full border-2 border-dashed border-primary/30 text-primary/60 hover:border-primary hover:text-primary transition-colors duration-150"
+      >
+        <Plus className="w-3 h-3" />
+        Assign SME
+      </button>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1">
+      <input
+        autoFocus
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === "Enter" && value.trim()) { onAdd(value.trim()); setValue(""); setIsAdding(false); }
+          if (e.key === "Escape") { setValue(""); setIsAdding(false); }
+        }}
+        placeholder="SME name..."
+        className="text-[12px] px-2 py-1 rounded-lg border-2 border-primary bg-white focus:outline-none shadow-[0_0_0_2px_rgba(24,119,242,0.2)] min-w-[120px]"
+      />
+      <button onClick={() => { if (value.trim()) { onAdd(value.trim()); setValue(""); setIsAdding(false); } }} className="p-1 text-primary hover:bg-[#E7F3FF] rounded">
+        <CheckCircle2 className="w-4 h-4" />
+      </button>
+      <button onClick={() => { setValue(""); setIsAdding(false); }} className="p-1 text-[#8A8D91] hover:bg-[#F0F2F5] rounded">
+        <X className="w-4 h-4" />
+      </button>
     </div>
   );
 }

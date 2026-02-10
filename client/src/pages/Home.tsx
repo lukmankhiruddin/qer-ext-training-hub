@@ -5,6 +5,8 @@
  */
 import { Link } from "wouter";
 import { useData } from "@/contexts/DataContext";
+import { useAdmin } from "@/contexts/AdminContext";
+import EditableField from "@/components/EditableField";
 import {
   CalendarDays,
   Users,
@@ -18,6 +20,7 @@ import {
   CheckCircle2,
   Circle,
   AlertCircle,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSessionTypeBadge, getStatusBadge } from "@/lib/data";
@@ -37,7 +40,8 @@ function formatDateShort(dateStr: string): string {
 }
 
 export default function Home() {
-  const { schedule, programs, smes, getScheduleForWave } = useData();
+  const { schedule, programs, smes, getScheduleForWave, updateProgram, updateSession } = useData();
+  const { isAdmin, logActivity } = useAdmin();
   const activeProgram = programs.find(p => p.status === "active");
   const upcomingProgram = programs.find(p => p.status === "upcoming");
   const uniqueSMEs = new Set(schedule.map(s => s.sme).filter(s => s !== "N/A"));
@@ -57,12 +61,32 @@ export default function Home() {
                   Active Program
                 </span>
               </div>
-              <h1 className="text-[28px] md:text-[32px] font-bold text-[#050505] leading-tight mb-2">
-                {activeProgram?.program || "Communication Hub"}
-              </h1>
-              <p className="text-[17px] text-[#65676B] mb-1">
-                {activeProgram?.wave || "Vendor Training Management"}
-              </p>
+              {isAdmin && activeProgram ? (
+                <EditableField
+                  value={activeProgram.program}
+                  fieldId="home-program-name"
+                  onSave={v => { updateProgram(activeProgram.id, { program: v }); logActivity("Program Updated", `Program name changed to ${v}`); }}
+                  className="text-[28px] md:text-[32px] font-bold text-[#050505] leading-tight block mb-2"
+                  as="h1"
+                />
+              ) : (
+                <h1 className="text-[28px] md:text-[32px] font-bold text-[#050505] leading-tight mb-2">
+                  {activeProgram?.program || "Communication Hub"}
+                </h1>
+              )}
+              {isAdmin && activeProgram ? (
+                <EditableField
+                  value={activeProgram.wave}
+                  fieldId="home-wave-name"
+                  onSave={v => { updateProgram(activeProgram.id, { wave: v }); logActivity("Program Updated", `Wave name changed to ${v}`); }}
+                  className="text-[17px] text-[#65676B] block mb-1"
+                  as="p"
+                />
+              ) : (
+                <p className="text-[17px] text-[#65676B] mb-1">
+                  {activeProgram?.wave || "Vendor Training Management"}
+                </p>
+              )}
               <p className="text-[15px] text-[#8A8D91] leading-relaxed mb-5 max-w-xl">
                 {activeProgram?.description || "Centralized communication platform for training schedules, SME coordination, and vendor management."}
               </p>
@@ -80,6 +104,14 @@ export default function Home() {
                     SME Directory
                   </Button>
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin">
+                    <Button variant="outline" className="gap-2 border-primary/30 text-primary font-semibold text-[15px] h-10 px-5 rounded-lg bg-[#E7F3FF] hover:bg-[#D0E8FF]">
+                      <Settings className="w-4 h-4" />
+                      Control Panel
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
             <div className="hidden lg:block w-64 h-40 rounded-xl overflow-hidden shrink-0">
@@ -176,9 +208,19 @@ export default function Home() {
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-[16px] font-bold text-[#050505]">
-                              {prog.wave}
-                            </h3>
+                            {isAdmin ? (
+                              <EditableField
+                                value={prog.wave}
+                                fieldId={`home-timeline-${prog.id}-wave`}
+                                onSave={v => { updateProgram(prog.id, { wave: v }); logActivity("Program Updated", `Wave name changed to ${v}`); }}
+                                className="text-[16px] font-bold text-[#050505]"
+                                as="h3"
+                              />
+                            ) : (
+                              <h3 className="text-[16px] font-bold text-[#050505]">
+                                {prog.wave}
+                              </h3>
+                            )}
                             <span className={cn(
                               "text-[11px] font-semibold px-2 py-0.5 rounded-full",
                               status.bgColor, status.textColor
@@ -203,9 +245,20 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <p className="text-[14px] text-[#65676B] leading-relaxed mb-3">
-                        {prog.description}
-                      </p>
+                      {isAdmin ? (
+                        <EditableField
+                          value={prog.description}
+                          fieldId={`home-timeline-${prog.id}-desc`}
+                          onSave={v => { updateProgram(prog.id, { description: v }); logActivity("Program Updated", `${prog.wave} description updated`); }}
+                          className="text-[14px] text-[#65676B] leading-relaxed block mb-3"
+                          as="p"
+                          multiline
+                        />
+                      ) : (
+                        <p className="text-[14px] text-[#65676B] leading-relaxed mb-3">
+                          {prog.description}
+                        </p>
+                      )}
 
                       {/* Modules */}
                       <div className="flex flex-wrap gap-1.5 mb-3">

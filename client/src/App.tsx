@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Schedule from "./pages/Schedule";
 import Directory from "./pages/Directory";
 import Programs from "./pages/Programs";
+import AdminPanel from "./pages/AdminPanel";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
         <Route path="/schedule" component={Schedule} />
         <Route path="/directory" component={Directory} />
         <Route path="/programs" component={Programs} />
+        <Route path="/admin" component={AdminPanel} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
