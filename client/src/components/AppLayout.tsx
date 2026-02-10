@@ -5,7 +5,7 @@
  * Branding: QER External Training Centre — Meta internal platform
  * Auth: Manus OAuth + local admin fallback
  */
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -61,6 +61,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localLoginDialogOpen, setLocalLoginDialogOpen] = useState(false);
   const [password, setPassword] = useState("");
+  const [supportExpanded, setSupportExpanded] = useState(false);
 
   const navItems = isAdmin ? adminNavItems : viewerNavItems;
 
@@ -344,43 +345,62 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      {/* Support Contact Banner */}
-      <div className="border-t border-border/30 bg-gradient-to-r from-primary/[0.04] via-purple-500/[0.03] to-primary/[0.04]">
-        <div className="container py-3.5 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/15 to-purple-500/10 flex items-center justify-center shrink-0">
-              <Headset className="w-[18px] h-[18px] text-primary" />
+      {/* Floating Support Contact — Bottom Right */}
+      <div className="fixed bottom-5 right-5 z-50">
+        {supportExpanded ? (
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_8px_40px_oklch(0.4_0.1_270_/_15%),0_2px_8px_oklch(0.4_0.1_270_/_8%)] border border-border/40 w-[280px] overflow-hidden animate-fade-in-up">
+            {/* Header */}
+            <div className="px-4 py-3 bg-gradient-to-r from-primary/[0.06] to-purple-500/[0.04] border-b border-border/30 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Headset className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-bold text-foreground">Training Support</span>
+              </div>
+              <button
+                onClick={() => setSupportExpanded(false)}
+                className="w-6 h-6 rounded-lg hover:bg-secondary/80 flex items-center justify-center transition-colors"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
             </div>
-            <div>
-              <p className="text-[13px] font-semibold text-foreground">
-                Need Training Support?
-              </p>
-              <p className="text-[12px] text-muted-foreground">
+            {/* Contact Info */}
+            <div className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/10 flex items-center justify-center shrink-0">
+                  <span className="text-[11px] font-bold text-emerald-600">
+                    {siteContact.name.split(" ").map(n => n[0]).join("")}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-foreground">{siteContact.name}</p>
+                  <p className="text-[12px] text-muted-foreground">{siteContact.role}</p>
+                </div>
+              </div>
+              <p className="text-[12px] text-muted-foreground leading-relaxed mb-3">
                 {siteContact.description}
               </p>
+              <a
+                href={`tel:${siteContact.phone.replace(/\s/g, "")}`}
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-emerald-500 text-white text-[13px] font-semibold hover:bg-emerald-600 transition-all duration-200 shadow-[0_2px_8px_oklch(0.55_0.18_155_/_25%)]"
+              >
+                <Phone className="w-4 h-4" />
+                {siteContact.phone}
+              </a>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500/15 to-teal-500/10 flex items-center justify-center">
-                <span className="text-[9px] font-bold text-emerald-600">
-                  {siteContact.name.split(" ").map(n => n[0]).join("")}
-                </span>
-              </div>
-              <div>
-                <p className="text-[13px] font-semibold text-foreground">{siteContact.name}</p>
-                <p className="text-[11px] text-muted-foreground">{siteContact.role}</p>
-              </div>
+        ) : (
+          <button
+            onClick={() => setSupportExpanded(true)}
+            className="group flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/95 backdrop-blur-xl shadow-[0_4px_20px_oklch(0.4_0.1_270_/_12%),0_2px_6px_oklch(0.4_0.1_270_/_6%)] border border-border/40 hover:shadow-[0_6px_28px_oklch(0.4_0.1_270_/_18%)] transition-all duration-300 hover:scale-[1.02]"
+          >
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300">
+              <Headset className="w-4 h-4 text-emerald-600" />
             </div>
-            <a
-              href={`tel:${siteContact.phone.replace(/\s/g, "")}`}
-              className="inline-flex items-center gap-1.5 px-3.5 py-[7px] rounded-xl bg-emerald-500/10 text-emerald-700 text-[13px] font-semibold hover:bg-emerald-500/15 transition-all duration-200"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              {siteContact.phone}
-            </a>
-          </div>
-        </div>
+            <div className="text-left">
+              <p className="text-[12px] font-semibold text-foreground leading-tight">Need Help?</p>
+              <p className="text-[11px] text-muted-foreground leading-tight">{siteContact.name} · {siteContact.role}</p>
+            </div>
+          </button>
+        )}
       </div>
 
       {/* Footer — Minimal, modern */}

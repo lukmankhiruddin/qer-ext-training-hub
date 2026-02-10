@@ -23,3 +23,4 @@
 - [x] Verify Wave 2b Complex Object data matches PDF
 - [x] Add TP Site POC support contact (Hannah Wynne, 085 219 0640) visible across the site
 - [x] Make support contact accessible from Dashboard, Schedule, and other key pages
+- [x] Reposition support contact from footer to a more visible location (floating bottom-right card)
