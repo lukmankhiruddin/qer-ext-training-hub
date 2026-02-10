@@ -10,3 +10,14 @@
 - [x] Map short SME names to full names in existing website data
 - [x] Replace all mock Wave 3 schedule and program data with real data
 - [x] Test Wave 3 data displays correctly on all pages
+- [x] Extract real Wave 2 VG SME Deep Dive Week data from PDF
+- [x] Extract real Wave 2 Complex Object Training data from PDF
+- [x] Map short SME names to full names for both Wave 2 sub-programs
+- [x] Replace all mock Wave 2 data with real sessions from both PDFs
+- [x] Update Wave 2 program to include both sub-programs (Deep Dive + Complex Object)
+- [x] Test Wave 2 data displays correctly on all pages
+- [x] Fix Wave 2a multi-week display (Feb 3-6 + Feb 10) with date-based column headers
+- [x] Fix duplicate React key error for two "Tuesday" columns in Wave 2a
+- [x] Correct SME mapping: Andrea Draskovic for RGS1 (not Fernanda Affonso)
+- [x] Correct Wave 2a sessions to match PDF (HeX/DoI/SSI/ASE on Thu, ANSA/SSPx/GV on Thu, Self Study on Fri, RGS2 on Tue Feb 10)
+- [x] Verify Wave 2b Complex Object data matches PDF

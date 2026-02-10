@@ -6,7 +6,8 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import {
   wave1Schedule,
-  wave2Schedule,
+  wave2aSchedule,
+  wave2bSchedule,
   wave3Schedule,
   programItinerary as initialPrograms,
   smeData as initialSMEs,
@@ -52,10 +53,11 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children }: { children: ReactNode }) {
   const [allSchedules, setAllSchedules] = useState<Record<string, TrainingSession[]>>({
     "prog-1": [...wave1Schedule],
-    "prog-2": [...wave2Schedule],
+    "prog-2a": [...wave2aSchedule],
+    "prog-2b": [...wave2bSchedule],
     "prog-3": [...wave3Schedule],
   });
-  const [activeWaveId, setActiveWaveId] = useState("prog-2");
+  const [activeWaveId, setActiveWaveId] = useState("prog-2a");
   const [programs, setPrograms] = useState<ProgramItinerary[]>(initialPrograms);
   const [smes, setSMEs] = useState<SME[]>(initialSMEs);
   const [contacts, setContacts] = useState<VendorContact[]>(initialContacts);

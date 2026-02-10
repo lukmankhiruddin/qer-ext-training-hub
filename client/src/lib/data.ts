@@ -111,17 +111,30 @@ export const programItinerary: ProgramItinerary[] = [
     daysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
   },
   {
-    id: "prog-2",
+    id: "prog-2a",
+    program: "TP Onboarding Schedule",
+    wave: "Wave 2 — VG SME Deep Dive Week",
+    location: "Dublin",
+    startDate: "2025-02-03",
+    endDate: "2025-02-10",
+    status: "active",
+    description: "VG SME Deep Dive training for 2 separate groups (no large rooms available). Covers RGS1, RGS2, Live Video Review, HeX/DoI/SSI/ASE, CSE, BH/V&I/HC, FDSP + Spam, and ANSA/SSPx/GV modules across Dublin site.",
+    modules: ["RGS1", "RGS2", "Live Video Review", "HeX, DoI, SSI, ASE", "CSE", "BH, V&I, HC", "FDSP + Spam", "ANSA, SSPx, GV"],
+    smesInvolved: ["Andrea Draskovic", "Farrukh Ahmed", "Heather Yarrish", "Iman Moussaoui", "Ahmed Sayed", "Mona Tirasetpakdee", "Arezoo Zahire", "Darla Nicole Florendo"],
+    daysOfWeek: ["Tue Feb 3", "Wed Feb 4", "Thu Feb 5", "Fri Feb 6", "Tue Feb 10"],
+  },
+  {
+    id: "prog-2b",
     program: "TP Onboarding Schedule",
     wave: "Wave 2 — Complex Object Training",
     location: "Dublin",
-    startDate: "2025-02-10",
+    startDate: "2025-02-11",
     endDate: "2025-02-13",
     status: "active",
-    description: "Upskilling training for Teleperformance vendor onboarding. Covers Live Video, Threads, Groups, Messenger, Max Recall, and Profile modules.",
-    modules: ["Live Video", "Threads / Simple Objects", "Groups", "Messenger IIC", "Max Recall", "Profile"],
-    smesInvolved: ["Farrukh Ahmed", "Martin Wallin", "Corneliu Onica", "Lukman Khiruddin"],
-    daysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+    description: "Upskilling training for Complex Object modules including Groups, Messenger IC, Max Recall, and Profile. Combines live training sessions with self-study materials and ops guidelines.",
+    modules: ["Groups", "Messenger IC", "Max Recall", "Profile"],
+    smesInvolved: ["Martin Wallin", "Corneliu Onica", "Lukman Khiruddin"],
+    daysOfWeek: ["Tuesday", "Wednesday", "Thursday"],
   },
   {
     id: "prog-3",
@@ -163,21 +176,56 @@ export const wave1Schedule: TrainingSession[] = [
   { id: "w1-17", day: "Friday", date: "2025-01-24", timeStart: "2:00 PM", timeEnd: "3:30 PM", training: "Wave 1 Wrap-Up & Feedback", sme: "Iman Moussaoui", type: "live", resources: [], waveId: "prog-1" },
 ];
 
-// Wave 2 — Complex Object Training (active, Feb 10-13, 2025) — from real CSV
-export const wave2Schedule: TrainingSession[] = [
-  { id: "ts-1", day: "Monday", date: "2025-02-10", timeStart: "9:30 AM", timeEnd: "10:30 AM", training: "Live Video Training", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-2" },
-  { id: "ts-2", day: "Monday", date: "2025-02-10", timeStart: "2:00 PM", timeEnd: "3:30 PM", training: "Threads / Simple Objects Module", sme: "Farrukh Ahmed", type: "upskilling", resources: [], waveId: "prog-2" },
-  { id: "ts-3", day: "Monday", date: "2025-02-10", timeStart: "4:00 PM", timeEnd: "5:00 PM", training: "Live Video Self Study", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2" },
-  { id: "ts-4", day: "Tuesday", date: "2025-02-11", timeStart: "9:30 AM", timeEnd: "10:30 AM", training: "Groups Training — Group Review Training Dec 2025", sme: "Martin Wallin", type: "live", resources: [], waveId: "prog-2" },
-  { id: "ts-5", day: "Tuesday", date: "2025-02-11", timeStart: "2:00 PM", timeEnd: "3:30 PM", training: "Groups Self Study — Ops Guideline & Complex Objects Module", sme: "N/A", type: "self-study", resources: ["Link Ops Guideline", "Complex Objects module"], waveId: "prog-2" },
-  { id: "ts-6", day: "Wednesday", date: "2025-02-12", timeStart: "9:30 AM", timeEnd: "10:00 AM", training: "Messenger Self Study — Ops Guidelines & Cornerstone", sme: "N/A", type: "self-study", resources: ["Link Ops guidelines", "Link Cornerstone Messenger Cornerstone"], waveId: "prog-2" },
-  { id: "ts-7", day: "Wednesday", date: "2025-02-12", timeStart: "10:30 AM", timeEnd: "12:00 PM", training: "Messenger IIC Upskilling Training", sme: "Corneliu Onica", type: "upskilling", resources: ["IIC for Messenger training material"], waveId: "prog-2" },
-  { id: "ts-8", day: "Wednesday", date: "2025-02-12", timeStart: "2:00 PM", timeEnd: "3:30 PM", training: "Messenger IIC Upskilling Training", sme: "Corneliu Onica", type: "upskilling", resources: ["IIC for Messenger training material"], waveId: "prog-2" },
-  { id: "ts-9", day: "Wednesday", date: "2025-02-12", timeStart: "3:30 PM", timeEnd: "4:30 PM", training: "Messenger Self Study — Ops Guidelines & Cornerstone", sme: "N/A", type: "self-study", resources: ["Link Ops guidelines", "Link Cornerstone Messenger Cornerstone"], waveId: "prog-2" },
-  { id: "ts-10", day: "Thursday", date: "2025-02-13", timeStart: "9:30 AM", timeEnd: "12:00 PM", training: "Max Recall Training", sme: "Lukman Khiruddin", type: "live", resources: [], waveId: "prog-2" },
-  { id: "ts-11", day: "Thursday", date: "2025-02-13", timeStart: "12:00 PM", timeEnd: "1:00 PM", training: "Max Recall Self Study", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2" },
-  { id: "ts-12", day: "Thursday", date: "2025-02-13", timeStart: "2:00 PM", timeEnd: "4:00 PM", training: "Profile Training", sme: "Lukman Khiruddin", type: "live", resources: [], waveId: "prog-2" },
-  { id: "ts-13", day: "Thursday", date: "2025-02-13", timeStart: "4:30 PM", timeEnd: "5:30 PM", training: "Profile Self Study", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2" },
+// Wave 2a — VG SME Deep Dive Week (active, Feb 3-10, 2025) — from real PDF
+// Training for 2 separate Groups (no large rooms available)
+// Uses date-based day labels ("Tue Feb 3") to handle multi-week span
+export const wave2aSchedule: TrainingSession[] = [
+  // TUESDAY FEB 3rd
+  { id: "w2a-1", day: "Tue Feb 3", date: "2025-02-03", timeStart: "10:30 AM", timeEnd: "12:00 PM", training: "RGS1 (Group 1)", sme: "Andrea Draskovic", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-2", day: "Tue Feb 3", date: "2025-02-03", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "Live Video Review (Group 2)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-3", day: "Tue Feb 3", date: "2025-02-03", timeStart: "2:30 PM", timeEnd: "4:00 PM", training: "RGS1 (Group 2)", sme: "Andrea Draskovic", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-4", day: "Tue Feb 3", date: "2025-02-03", timeStart: "3:00 PM", timeEnd: "4:00 PM", training: "BH, V&I, HC (Group 1)", sme: "Heather Yarrish", type: "live", resources: [], waveId: "prog-2a" },
+  // WEDNESDAY FEB 4th
+  { id: "w2a-5", day: "Wed Feb 4", date: "2025-02-04", timeStart: "10:00 AM", timeEnd: "10:30 AM", training: "CSE (Group 2)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-6", day: "Wed Feb 4", date: "2025-02-04", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "Live Video Review (Group 1)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-7", day: "Wed Feb 4", date: "2025-02-04", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "Site-Led Wellness Activity (Group 2)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-2a" },
+  { id: "w2a-8", day: "Wed Feb 4", date: "2025-02-04", timeStart: "2:30 PM", timeEnd: "3:00 PM", training: "CSE (Group 2)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-9", day: "Wed Feb 4", date: "2025-02-04", timeStart: "3:00 PM", timeEnd: "4:00 PM", training: "BH, V&I, HC (Group 1)", sme: "Heather Yarrish", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-10", day: "Wed Feb 4", date: "2025-02-04", timeStart: "4:00 PM", timeEnd: "5:00 PM", training: "Site-Led Wellness Activity (Group 2)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-2a" },
+  { id: "w2a-23", day: "Wed Feb 4", date: "2025-02-04", timeStart: "TBD", timeEnd: "TBD", training: "Ops/PTQ Team Session (TBD)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-2a" },
+  // THURSDAY FEB 5th
+  { id: "w2a-11", day: "Thu Feb 5", date: "2025-02-05", timeStart: "10:30 AM", timeEnd: "12:00 PM", training: "HeX, DoI, SSI, ASE (Group 1)", sme: "Iman Moussaoui", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-12", day: "Thu Feb 5", date: "2025-02-05", timeStart: "10:30 AM", timeEnd: "12:00 PM", training: "ANSA, SSPx, GV (Group 2)", sme: "Ahmed Sayed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-13", day: "Thu Feb 5", date: "2025-02-05", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "ANSA, SSPx, GV (Group 1)", sme: "Ahmed Sayed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-14", day: "Thu Feb 5", date: "2025-02-05", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "HeX, DoI, SSI, ASE (Group 2)", sme: "Iman Moussaoui", type: "live", resources: [], waveId: "prog-2a" },
+  // FRIDAY FEB 6th
+  { id: "w2a-15", day: "Fri Feb 6", date: "2025-02-06", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "FDSP + Spam (Group 1)", sme: "Mona Tirasetpakdee", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-16", day: "Fri Feb 6", date: "2025-02-06", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "Self Study / Nesting (Group 2)", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2a" },
+  { id: "w2a-17", day: "Fri Feb 6", date: "2025-02-06", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "FDSP + Spam (Group 1)", sme: "Mona Tirasetpakdee", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-18", day: "Fri Feb 6", date: "2025-02-06", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "Self Study / Nesting (Group 2)", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2a" },
+  { id: "w2a-24", day: "Fri Feb 6", date: "2025-02-06", timeStart: "TBD", timeEnd: "TBD", training: "Ops Lead Sync with Site Leads (TBD)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-2a" },
+  // TUESDAY FEB 10th (Week 2)
+  { id: "w2a-19", day: "Tue Feb 10", date: "2025-02-10", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "ANSA, SSPx, GV (Group 1)", sme: "Ahmed Sayed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-20", day: "Tue Feb 10", date: "2025-02-10", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "RGS2 (Group 2)", sme: "Darla Nicole Florendo", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-21", day: "Tue Feb 10", date: "2025-02-10", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "ANSA, SSPx, GV (Group 1)", sme: "Ahmed Sayed", type: "live", resources: [], waveId: "prog-2a" },
+  { id: "w2a-22", day: "Tue Feb 10", date: "2025-02-10", timeStart: "4:30 PM", timeEnd: "5:00 PM", training: "RGS2 (Group 2)", sme: "Darla Nicole Florendo", type: "live", resources: [], waveId: "prog-2a" },
+];
+
+// Wave 2b — Complex Object Training (active, Feb 11-13, 2025) — from real PDF
+export const wave2bSchedule: TrainingSession[] = [
+  // TUESDAY FEB 11th (Wednesday in PDF = Feb 11)
+  { id: "w2b-1", day: "Tuesday", date: "2025-02-11", timeStart: "10:00 AM", timeEnd: "11:30 AM", training: "Groups Training / Group Review Training Dec 2025", sme: "Martin Wallin", type: "live", resources: [], waveId: "prog-2b" },
+  { id: "w2b-2", day: "Tuesday", date: "2025-02-11", timeStart: "2:30 PM", timeEnd: "3:30 PM", training: "Groups Self Study", sme: "N/A", type: "self-study", resources: ["Ops guidelines", "Confluence", "Ops tools review"], waveId: "prog-2b" },
+  // WEDNESDAY FEB 12th
+  { id: "w2b-3", day: "Wednesday", date: "2025-02-12", timeStart: "9:30 AM", timeEnd: "10:00 AM", training: "Messenger Self Study", sme: "N/A", type: "self-study", resources: ["Ops guidelines", "Messenger Connections"], waveId: "prog-2b" },
+  { id: "w2b-4", day: "Wednesday", date: "2025-02-12", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "Messenger IC Upskilling Training", sme: "Corneliu Onica", type: "upskilling", resources: ["IC for Messenger training material"], waveId: "prog-2b" },
+  { id: "w2b-5", day: "Wednesday", date: "2025-02-12", timeStart: "2:00 PM", timeEnd: "3:00 PM", training: "Messenger IC Upskilling Training", sme: "Corneliu Onica", type: "upskilling", resources: ["IC for Messenger training material"], waveId: "prog-2b" },
+  { id: "w2b-6", day: "Wednesday", date: "2025-02-12", timeStart: "4:00 PM", timeEnd: "4:30 PM", training: "Messenger Self Study", sme: "N/A", type: "self-study", resources: ["Ops guidelines", "Messenger Connections"], waveId: "prog-2b" },
+  // THURSDAY FEB 13th
+  { id: "w2b-7", day: "Thursday", date: "2025-02-13", timeStart: "10:00 AM", timeEnd: "11:00 AM", training: "Max Recall Training", sme: "Lukman Khiruddin", type: "live", resources: [], waveId: "prog-2b" },
+  { id: "w2b-8", day: "Thursday", date: "2025-02-13", timeStart: "12:00 PM", timeEnd: "1:00 PM", training: "Max Recall Self Study", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2b" },
+  { id: "w2b-9", day: "Thursday", date: "2025-02-13", timeStart: "2:30 PM", timeEnd: "3:30 PM", training: "Profile Training", sme: "Lukman Khiruddin", type: "live", resources: [], waveId: "prog-2b" },
+  { id: "w2b-10", day: "Thursday", date: "2025-02-13", timeStart: "4:30 PM", timeEnd: "5:00 PM", training: "Profile Self Study", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2b" },
 ];
 
 // Wave 3 — VG SME Deep Dive Week (upcoming, Mar 10-13, 2025) — from real PDF
@@ -211,14 +259,15 @@ export const wave3Schedule: TrainingSession[] = [
   { id: "w3-20", day: "Friday", date: "2025-03-13", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "Ops Lead Sync with Site Leads (TBD)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-3" },
 ];
 
-// Combined schedule (backward compatible)
-export const trainingSchedule: TrainingSession[] = [...wave2Schedule];
+// Combined schedule (backward compatible — uses active Wave 2a)
+export const trainingSchedule: TrainingSession[] = [...wave2aSchedule];
 
 // All schedules by wave ID
 export function getScheduleByWaveId(waveId: string): TrainingSession[] {
   switch (waveId) {
     case "prog-1": return wave1Schedule;
-    case "prog-2": return wave2Schedule;
+    case "prog-2a": return wave2aSchedule;
+    case "prog-2b": return wave2bSchedule;
     case "prog-3": return wave3Schedule;
     default: return [];
   }
