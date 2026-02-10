@@ -1,6 +1,6 @@
 /*
  * Communication Hub — Core Data Layer
- * Design: "Anthropic Warmth" — Editorial Minimalism
+ * Design: Meta/Facebook — Clean, functional, blue accents
  * All data sourced from real CSV/XLSX files
  */
 
@@ -207,9 +207,9 @@ export function getSessionTypeColor(type: TrainingSession['type']): string {
 
 export function getSessionTypeBadge(type: TrainingSession['type']): { label: string; color: string } {
   switch (type) {
-    case 'live': return { label: 'Live Training', color: 'bg-amber/20 text-amber-dark' };
-    case 'self-study': return { label: 'Self Study', color: 'bg-sage/15 text-sage' };
-    case 'upskilling': return { label: 'Upskilling', color: 'bg-primary/15 text-primary' };
-    default: return { label: 'Session', color: 'bg-muted text-muted-foreground' };
+    case 'live': return { label: 'Live Training', color: 'bg-[#E8F5E9] text-[#2E7D32]' };
+    case 'self-study': return { label: 'Self Study', color: 'bg-[#F0F2F5] text-[#65676B]' };
+    case 'upskilling': return { label: 'Upskilling', color: 'bg-[#E7F3FF] text-[#1877F2]' };
+    default: return { label: 'Session', color: 'bg-[#F0F2F5] text-[#65676B]' };
   }
 }

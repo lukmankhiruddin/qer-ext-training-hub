@@ -1,7 +1,6 @@
 /*
  * EditableField — Inline editing component for admin mode
- * Design: "Anthropic Warmth" — Empathetic Admin UX
- * Pencil icons appear on hover, edits save automatically
+ * Design: Meta/Facebook — Clean blue focus ring, subtle hover border
  */
 import { useState, useRef, useEffect } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -73,7 +72,7 @@ export default function EditableField({
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
             className={cn(
-              "bg-primary/5 border border-primary/30 rounded-md px-2 py-1 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none min-w-[200px]",
+              "bg-white border-2 border-primary rounded-lg px-2.5 py-1.5 text-[#050505] focus:outline-none shadow-[0_0_0_2px_rgba(24,119,242,0.2)] resize-none min-w-[200px] text-[14px]",
               className
             )}
             rows={3}
@@ -87,14 +86,14 @@ export default function EditableField({
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
             className={cn(
-              "bg-primary/5 border border-primary/30 rounded-md px-2 py-0.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-w-[120px]",
+              "bg-white border-2 border-primary rounded-lg px-2.5 py-1 text-[#050505] focus:outline-none shadow-[0_0_0_2px_rgba(24,119,242,0.2)] min-w-[120px] text-[14px]",
               className
             )}
           />
         )}
         <button
           onClick={handleSave}
-          className="p-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
+          className="p-1.5 rounded-full bg-primary hover:bg-[#1565D8] text-white transition-colors duration-150"
         >
           <Check className="w-3.5 h-3.5" />
         </button>
@@ -105,13 +104,13 @@ export default function EditableField({
   return (
     <Tag
       className={cn(
-        "relative group/edit cursor-pointer border border-dashed border-transparent hover:border-primary/30 rounded-md px-1 -mx-1 transition-all duration-200",
+        "relative group/edit cursor-pointer rounded-md px-1 -mx-1 transition-all duration-150 hover:bg-[#E7F3FF]",
         className
       )}
       onClick={() => setIsEditing(true)}
     >
       {value}
-      <Pencil className="inline-block w-3 h-3 ml-1.5 opacity-0 group-hover/edit:opacity-60 text-primary transition-opacity duration-200" />
+      <Pencil className="inline-block w-3 h-3 ml-1 opacity-0 group-hover/edit:opacity-70 text-primary transition-opacity duration-150" />
     </Tag>
   );
 }

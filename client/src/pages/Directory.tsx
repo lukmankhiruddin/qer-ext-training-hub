@@ -1,24 +1,18 @@
 /*
  * Directory — SME Directory with search, filter, and capacity overview
- * Design: "Anthropic Warmth" — Warm cards with editorial typography
+ * Design: Meta/Facebook — Circular avatars, white cards, blue hover states
  * 44 real SMEs from QERName.xlsx
  */
 import { useState, useMemo } from "react";
 import { useData } from "@/contexts/DataContext";
-import { motion } from "framer-motion";
 import {
   Search,
   X,
   MapPin,
-  Shield,
-  Tag,
   Users,
-  ChevronDown,
   Globe,
   Building2,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -32,12 +26,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { SME } from "@/lib/data";
-
-const TRAINING_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/2Ek3I5O51CtLc8AMPuCdVC/sandbox/qXxBMGSIsheuzA4d28vcrc-img-4_1770761237000_na1fn_dHJhaW5pbmctaWxsdXN0cmF0aW9u.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvMkVrM0k1TzUxQ3RMYzhBTVB1Q2RWQy9zYW5kYm94L3FYeEJNR1NJc2hldXpBNGQyOHZjcmMtaW1nLTRfMTc3MDc2MTIzNzAwMF9uYTFmbl9kSEpoYVc1cGJtY3RhV3hzZFhOMGNtRjBhVzl1LnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=SirMrGB6azVCvIFKMFw29eubEt9gmB8V7QdJRS1X7tfyQIO3E~rlI--7nOGTvN0BS9WRg~-Ie1rr9jXtmRAA24DkaIDnEraM2JkQiN7ynF04EAHdwTcnF9BVdG2hEcWxlzzL3mlkWTSBQe62LrYOZIVQtywtOgpUYrSUMnZI7VvnNQcGzzEfTvzsWHm4OCdlf57knuCVytyR3rVWEc~1Lcgog8CS1LYRceKZIDGLv3EvkJT38C~K~DL55EGEtIevv7B7VpbjktJ9jIXHgZebNSshMf~SA1QRp~sxCElbCgTQKok48AY8aNKDrthaKxfGZ-AC6XkKM~8Sd5xJl-OQpg__";
 
 export default function Directory() {
   const { smes, contacts } = useData();
@@ -57,7 +48,6 @@ export default function Directory() {
     return Array.from(r).sort();
   }, [smes]);
 
-  // Markets
   const markets = useMemo(() => {
     const m = new Set(smes.map(s => s.market));
     return Array.from(m).sort();
@@ -87,285 +77,294 @@ export default function Directory() {
       .toUpperCase();
   };
 
-  // Generate consistent color from name
+  // Generate consistent color from name — Meta style colors
   const getAvatarColor = (name: string) => {
     const colors = [
-      "bg-amber/20 text-amber-dark",
-      "bg-sage/20 text-sage",
-      "bg-primary/15 text-primary",
-      "bg-rose-100 text-rose-700",
-      "bg-sky-100 text-sky-700",
-      "bg-violet-100 text-violet-700",
-      "bg-emerald-100 text-emerald-700",
-      "bg-orange-100 text-orange-700",
+      "bg-[#E7F3FF] text-primary",
+      "bg-[#E8F5E9] text-[#2E7D32]",
+      "bg-[#FFF3E0] text-[#E65100]",
+      "bg-[#F3E5F5] text-[#7B1FA2]",
+      "bg-[#E3F2FD] text-[#1565C0]",
+      "bg-[#FBE9E7] text-[#BF360C]",
+      "bg-[#E0F2F1] text-[#00695C]",
+      "bg-[#FCE4EC] text-[#C62828]",
     ];
     const index = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length;
     return colors[index];
   };
 
   return (
-    <div className="container py-8 md:py-12">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 text-sage" />
-            <span className="font-mono-label text-sage uppercase tracking-wider">
-              SME Directory
+    <div className="bg-[#F0F2F5] min-h-screen">
+      {/* Header — Meta style: white banner */}
+      <div className="bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
+        <div className="container py-5">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-semibold text-primary uppercase tracking-wide">
+                  SME Directory
+                </span>
+              </div>
+              <h1 className="text-[24px] font-bold text-[#050505] mb-1">
+                Subject Matter Experts
+              </h1>
+              <p className="text-[15px] text-[#65676B]">
+                {smes.length} experts across {locations.length} locations and {markets.length} markets
+              </p>
+            </div>
+
+            {/* Capacity summary — Meta style */}
+            <div className="flex gap-3">
+              {locations.map(loc => {
+                const count = smes.filter(s => s.location === loc).length;
+                return (
+                  <div key={loc} className="meta-card px-4 py-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#E7F3FF] flex items-center justify-center">
+                      <MapPin className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] text-[#65676B]">{loc}</p>
+                      <p className="text-[20px] font-bold text-[#050505]">{count}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container py-4">
+        {/* Filters — Meta style */}
+        <div className="meta-card p-4 mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="relative flex-1 w-full sm:max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A8D91]" />
+              <input
+                placeholder="Search by name, market, or policy..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-[#F0F2F5] border-none rounded-full text-[15px] text-[#050505] placeholder-[#8A8D91] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-colors duration-150"
+              />
+              {search && (
+                <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8D91] hover:text-[#050505]">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <Select value={locationFilter} onValueChange={setLocationFilter}>
+              <SelectTrigger className="w-full sm:w-[160px] bg-[#F0F2F5] border-none rounded-lg h-9 text-[14px]">
+                <SelectValue placeholder="Location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Locations</SelectItem>
+                {locations.map(l => (
+                  <SelectItem key={l} value={l}>{l}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-[#F0F2F5] border-none rounded-lg h-9 text-[14px]">
+                <SelectValue placeholder="Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                {roles.map(r => (
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <span className="text-[13px] text-[#8A8D91] font-medium ml-auto">
+              {filtered.length} result{filtered.length !== 1 ? "s" : ""}
             </span>
           </div>
-          <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
-            Subject Matter Experts
-          </h1>
-          <p className="text-muted-foreground">
-            {smes.length} experts across {locations.length} locations and {markets.length} markets
-          </p>
         </div>
 
-        {/* Capacity summary */}
-        <div className="flex gap-3">
-          {locations.map(loc => {
-            const count = smes.filter(s => s.location === loc).length;
-            return (
-              <Card key={loc} className="border-border/40">
-                <CardContent className="p-3 flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{loc}</p>
-                    <p className="font-display text-xl text-foreground">{count}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6 p-4 bg-card rounded-xl border border-border/50">
-        <div className="relative flex-1 w-full sm:max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, market, or policy..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="pl-9 bg-background"
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        <Select value={locationFilter} onValueChange={setLocationFilter}>
-          <SelectTrigger className="w-full sm:w-[160px] bg-background">
-            <SelectValue placeholder="Location" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Locations</SelectItem>
-            {locations.map(l => (
-              <SelectItem key={l} value={l}>{l}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-full sm:w-[180px] bg-background">
-            <SelectValue placeholder="Role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            {roles.map(r => (
-              <SelectItem key={r} value={r}>{r}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <span className="font-mono-label text-muted-foreground/60 text-[11px] ml-auto">
-          {filtered.length} result{filtered.length !== 1 ? "s" : ""}
-        </span>
-      </div>
-
-      {/* SME Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {filtered.map((sme, i) => (
-          <motion.div
-            key={sme.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: Math.min(i * 0.02, 0.5), duration: 0.3 }}
-          >
-            <Card
-              className="border-border/40 shadow-none hover:shadow-md hover:border-border transition-all duration-300 cursor-pointer group"
+        {/* SME Grid — Meta style: Facebook people cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {filtered.map((sme) => (
+            <div
+              key={sme.id}
+              className="meta-card hover:shadow-[0_2px_4px_rgba(0,0,0,0.1),0_8px_16px_rgba(0,0,0,0.1)] transition-shadow duration-200 cursor-pointer group"
               onClick={() => setSelectedSME(sme)}
             >
-              <CardContent className="p-4">
+              <div className="p-4">
                 <div className="flex items-start gap-3">
-                  {/* Avatar */}
+                  {/* Avatar — Meta style: circular */}
                   <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center text-sm font-semibold shrink-0",
+                    "w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0",
                     getAvatarColor(sme.name)
                   )}>
                     {getInitials(sme.name)}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                    <h3 className="text-[15px] font-semibold text-[#050505] truncate group-hover:text-primary transition-colors duration-150">
                       {sme.name}
                     </h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <Globe className="w-3 h-3 text-muted-foreground/50" />
-                      <span className="text-xs text-muted-foreground truncate">
+                      <Globe className="w-3 h-3 text-[#8A8D91]" />
+                      <span className="text-[13px] text-[#65676B] truncate">
                         {sme.market}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Roles */}
+                {/* Roles — Meta style badges */}
                 <div className="flex flex-wrap gap-1 mt-3">
-                  {sme.roles.slice(0, 3).map(role => (
-                    <span
-                      key={role}
-                      className={cn(
-                        "px-1.5 py-0.5 rounded text-[10px] font-medium",
-                        role === "Pillar Lead SME"
-                          ? "bg-amber/15 text-amber-dark"
-                          : role === "Site Lead"
-                          ? "bg-sage/15 text-sage"
-                          : role === "VG SME"
-                          ? "bg-primary/10 text-primary"
-                          : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {role}
-                    </span>
-                  ))}
+                  {sme.roles.slice(0, 3).map(role => {
+                    const roleClass = role === "Pillar Lead SME"
+                      ? "bg-[#FFF3E0] text-[#E65100]"
+                      : role === "Site Lead"
+                      ? "bg-[#E8F5E9] text-[#2E7D32]"
+                      : role === "VG SME"
+                      ? "bg-[#E7F3FF] text-primary"
+                      : "bg-[#F0F2F5] text-[#65676B]";
+                    return (
+                      <span
+                        key={role}
+                        className={cn(
+                          "px-2 py-0.5 rounded text-[11px] font-semibold",
+                          roleClass
+                        )}
+                      >
+                        {role}
+                      </span>
+                    );
+                  })}
                 </div>
 
                 {/* Location */}
-                <div className="flex items-center gap-1.5 mt-2.5 pt-2.5 border-t border-border/30">
-                  <MapPin className="w-3 h-3 text-muted-foreground/50" />
-                  <span className="text-[11px] text-muted-foreground">{sme.location || "—"}</span>
+                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-[#CED0D4]/40">
+                  <MapPin className="w-3 h-3 text-[#8A8D91]" />
+                  <span className="text-[12px] text-[#65676B]">{sme.location || "—"}</span>
                   {sme.space.includes("Complex") && (
-                    <span className="ml-auto text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                    <span className="ml-auto text-[11px] font-semibold text-primary bg-[#E7F3FF] px-2 py-0.5 rounded">
                       Complex
                     </span>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+              </div>
+            </div>
+          ))}
+        </div>
 
-      {/* SME Detail Dialog */}
-      <Dialog open={!!selectedSME} onOpenChange={open => !open && setSelectedSME(null)}>
-        <DialogContent className="max-w-md">
-          {selectedSME && (
-            <>
-              <DialogHeader>
-                <div className="flex items-center gap-4 mb-2">
-                  <div className={cn(
-                    "w-14 h-14 rounded-xl flex items-center justify-center text-lg font-bold",
-                    getAvatarColor(selectedSME.name)
-                  )}>
-                    {getInitials(selectedSME.name)}
+        {/* SME Detail Dialog — Meta style */}
+        <Dialog open={!!selectedSME} onOpenChange={open => !open && setSelectedSME(null)}>
+          <DialogContent className="max-w-md rounded-xl">
+            {selectedSME && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className={cn(
+                      "w-14 h-14 rounded-full flex items-center justify-center text-[18px] font-bold",
+                      getAvatarColor(selectedSME.name)
+                    )}>
+                      {getInitials(selectedSME.name)}
+                    </div>
+                    <div>
+                      <DialogTitle className="text-[20px] font-bold text-[#050505]">{selectedSME.name}</DialogTitle>
+                      <p className="text-[14px] text-[#65676B]">{selectedSME.market}</p>
+                    </div>
                   </div>
+                </DialogHeader>
+
+                <div className="space-y-4 mt-2">
+                  {/* Roles */}
                   <div>
-                    <DialogTitle className="font-display text-xl">{selectedSME.name}</DialogTitle>
-                    <p className="text-sm text-muted-foreground mt-0.5">{selectedSME.market} Market</p>
-                  </div>
-                </div>
-              </DialogHeader>
-
-              <div className="space-y-4 mt-2">
-                {/* Roles */}
-                <div>
-                  <p className="font-mono-label text-muted-foreground/60 text-[11px] uppercase mb-2">Roles</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedSME.roles.map(role => (
-                      <span key={role} className="px-2.5 py-1 rounded-lg text-xs font-medium bg-accent text-accent-foreground">
-                        {role}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Vendors */}
-                <div>
-                  <p className="font-mono-label text-muted-foreground/60 text-[11px] uppercase mb-2">Vendors</p>
-                  <div className="space-y-1.5">
-                    {selectedSME.vendors.map(v => (
-                      <div key={v} className="flex items-center gap-2 text-sm text-foreground">
-                        <Building2 className="w-3.5 h-3.5 text-muted-foreground/50" />
-                        {v}
-                      </div>
-                    ))}
-                    {selectedSME.vendors.length === 0 && (
-                      <span className="text-sm text-muted-foreground">—</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Policy SME */}
-                {selectedSME.policySME && (
-                  <div>
-                    <p className="font-mono-label text-muted-foreground/60 text-[11px] uppercase mb-2">Policy Expertise</p>
+                    <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Roles</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {selectedSME.policySME.split(",").map((p, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-md text-xs bg-amber/10 text-amber-dark border border-amber/15">
-                          {p.trim()}
+                      {selectedSME.roles.map(role => (
+                        <span key={role} className="px-2.5 py-1 rounded-lg text-[13px] font-semibold bg-[#F0F2F5] text-[#050505]">
+                          {role}
                         </span>
                       ))}
                     </div>
                   </div>
-                )}
 
-                {/* Space */}
-                <div>
-                  <p className="font-mono-label text-muted-foreground/60 text-[11px] uppercase mb-2">Space</p>
-                  <p className="text-sm text-foreground">{selectedSME.space}</p>
-                </div>
+                  {/* Vendors */}
+                  <div>
+                    <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Vendors</p>
+                    <div className="space-y-1.5">
+                      {selectedSME.vendors.map(v => (
+                        <div key={v} className="flex items-center gap-2 text-[14px] text-[#050505]">
+                          <Building2 className="w-3.5 h-3.5 text-[#65676B]" />
+                          {v}
+                        </div>
+                      ))}
+                      {selectedSME.vendors.length === 0 && (
+                        <span className="text-[14px] text-[#65676B]">—</span>
+                      )}
+                    </div>
+                  </div>
 
-                {/* Location */}
-                <div>
-                  <p className="font-mono-label text-muted-foreground/60 text-[11px] uppercase mb-2">Location</p>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <MapPin className="w-3.5 h-3.5 text-muted-foreground/50" />
-                    {selectedSME.location || "Not specified"}
+                  {/* Policy SME */}
+                  {selectedSME.policySME && (
+                    <div>
+                      <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Policy Expertise</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedSME.policySME.split(",").map((p, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded-md text-[13px] font-medium bg-[#E7F3FF] text-primary">
+                            {p.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Space */}
+                  <div>
+                    <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Space</p>
+                    <p className="text-[14px] text-[#050505]">{selectedSME.space}</p>
+                  </div>
+
+                  {/* Location */}
+                  <div>
+                    <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-2">Location</p>
+                    <div className="flex items-center gap-2 text-[14px] text-[#050505]">
+                      <MapPin className="w-3.5 h-3.5 text-[#65676B]" />
+                      {selectedSME.location || "Not specified"}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
-      {/* Vendor Contacts Section */}
-      <div className="mt-12">
-        <div className="flex items-center gap-2 mb-4">
-          <Building2 className="w-4 h-4 text-amber" />
-          <h2 className="font-display text-2xl text-foreground">Vendor Contacts</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {contacts.map(contact => (
-            <Card key={contact.id} className="border-border/40">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Building2 className="w-4 h-4 text-amber" />
-                  <h3 className="text-sm font-medium text-foreground">{contact.vendor}</h3>
+        {/* Vendor Contacts Section */}
+        <div className="mt-8">
+          <div className="meta-card">
+            <div className="p-4 border-b border-[#CED0D4]/60">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-primary" />
+                <h2 className="text-[20px] font-bold text-[#050505]">Vendor Contacts</h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-x divide-[#CED0D4]/40">
+              {contacts.map(contact => (
+                <div key={contact.id} className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-[#E7F3FF] flex items-center justify-center">
+                      <Building2 className="w-4 h-4 text-primary" />
+                    </div>
+                    <h3 className="text-[15px] font-semibold text-[#050505]">{contact.vendor}</h3>
+                  </div>
+                  <p className="text-[14px] text-[#050505] mb-0.5">{contact.primaryContact}</p>
+                  <p className="text-[13px] text-[#65676B]">{contact.role}</p>
+                  <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-[#CED0D4]/30">
+                    <MapPin className="w-3 h-3 text-[#8A8D91]" />
+                    <span className="text-[12px] text-[#65676B]">{contact.location}</span>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mb-1">{contact.primaryContact}</p>
-                <p className="text-xs text-muted-foreground/70">{contact.role}</p>
-                <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-border/30">
-                  <MapPin className="w-3 h-3 text-muted-foreground/50" />
-                  <span className="text-[11px] text-muted-foreground">{contact.location}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

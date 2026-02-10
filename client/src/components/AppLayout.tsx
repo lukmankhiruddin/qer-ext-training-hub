@@ -1,12 +1,11 @@
 /*
  * AppLayout — Global navigation shell
- * Design: "Anthropic Warmth" — Top navigation bar (64px) with horizontal tabs
- * Warm, editorial feel with Instrument Serif for the brand name
+ * Design: Meta/Facebook — White top bar, blue accents, system font stack
+ * Clean, functional navigation with subtle hover states
  */
 import { type ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAdmin } from "@/contexts/AdminContext";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   CalendarDays,
   LayoutDashboard,
@@ -34,46 +33,42 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-        <div className="container flex items-center justify-between h-16">
+      {/* Top Navigation Bar — Meta style: white bg, bottom border, 56px height */}
+      <header className="sticky top-0 z-50 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
+        <div className="container flex items-center justify-between h-14">
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-3 no-underline">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">CH</span>
+          <Link href="/" className="flex items-center gap-2.5 no-underline">
+            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-white font-bold text-sm tracking-tight">CH</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-display text-xl leading-tight text-foreground">
+              <span className="text-[17px] font-bold leading-tight text-[#050505]">
                 Communication Hub
               </span>
-              <span className="text-[11px] text-muted-foreground tracking-wide uppercase hidden sm:block">
+              <span className="text-[11px] text-[#65676B] font-normal hidden sm:block">
                 Vendor Training Management
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop Navigation — Meta style: pill-shaped hover, blue active indicator */}
+          <nav className="hidden md:flex items-center gap-0.5">
             {navItems.map(item => {
               const isActive = location === item.path;
               return (
                 <Link key={item.path} href={item.path}>
                   <span
                     className={cn(
-                      "relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                      "relative flex items-center gap-2 px-4 py-2 rounded-lg text-[14px] font-medium transition-colors duration-150",
                       isActive
-                        ? "text-foreground bg-accent"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        ? "text-primary bg-secondary"
+                        : "text-[#65676B] hover:bg-[#F2F2F2]"
                     )}
                   >
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className={cn("w-[18px] h-[18px]", isActive && "text-primary")} />
                     {item.label}
                     {isActive && (
-                      <motion.div
-                        layoutId="nav-indicator"
-                        className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-full"
-                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                      />
+                      <span className="absolute -bottom-[9px] left-3 right-3 h-[3px] bg-primary rounded-full" />
                     )}
                   </span>
                 </Link>
@@ -88,8 +83,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               size="sm"
               onClick={toggleAdmin}
               className={cn(
-                "gap-2 transition-all duration-300 text-xs",
-                isAdmin && "shadow-md"
+                "gap-1.5 text-[13px] font-semibold rounded-md h-9 px-3 transition-colors duration-150",
+                isAdmin
+                  ? "bg-primary text-white hover:bg-[#1565D8] shadow-none"
+                  : "border-[#CED0D4] text-[#65676B] hover:bg-[#F2F2F2] bg-white"
               )}
             >
               {isAdmin ? (
@@ -109,7 +106,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="md:hidden w-9 h-9 rounded-full hover:bg-[#F2F2F2]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -117,86 +114,61 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {/* Admin mode indicator bar */}
-        <AnimatePresence>
-          {isAdmin && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <div className="bg-primary/5 border-t border-primary/10 px-4 py-1.5">
-                <div className="container flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-xs text-primary font-medium">
-                    Admin editing mode — Click any editable field to modify
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Admin mode indicator bar — Meta style: blue tint */}
+        {isAdmin && (
+          <div className="bg-[#E7F3FF] border-t border-[#1877F2]/15 px-4 py-1.5">
+            <div className="container flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-[13px] text-primary font-semibold">
+                Admin editing mode
+              </span>
+              <span className="text-[13px] text-[#65676B]">
+                — Click any editable field to modify
+              </span>
+            </div>
+          </div>
+        )}
 
-        {/* Mobile Navigation */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="md:hidden overflow-hidden border-t border-border/60"
-            >
-              <nav className="container py-3 flex flex-col gap-1">
-                {navItems.map(item => {
-                  const isActive = location === item.path;
-                  return (
-                    <Link key={item.path} href={item.path}>
-                      <span
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={cn(
-                          "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                          isActive
-                            ? "text-foreground bg-accent"
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                        )}
-                      >
-                        <item.icon className="w-4 h-4" />
-                        {item.label}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Mobile Navigation — Meta style: clean slide down */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-[#CED0D4]">
+            <nav className="container py-2 flex flex-col gap-0.5">
+              {navItems.map(item => {
+                const isActive = location === item.path;
+                return (
+                  <Link key={item.path} href={item.path}>
+                    <span
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition-colors duration-150",
+                        isActive
+                          ? "text-primary bg-[#E7F3FF]"
+                          : "text-[#050505] hover:bg-[#F2F2F2]"
+                      )}
+                    >
+                      <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-[#65676B]")} />
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main className="min-h-[calc(100vh-4rem)]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
+      <main className="min-h-[calc(100vh-3.5rem)]">
+        {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border/40 bg-muted/30">
-        <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
+      {/* Footer — Meta style: minimal, gray text */}
+      <footer className="border-t border-[#CED0D4] bg-white">
+        <div className="container py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-[13px] text-[#65676B]">
             Communication Hub — Vendor Training Management System
           </p>
-          <p className="font-mono-label text-muted-foreground/60">
+          <p className="text-[13px] text-[#8A8D91]">
             Wave 2 Complex Object Training · Dublin
           </p>
         </div>

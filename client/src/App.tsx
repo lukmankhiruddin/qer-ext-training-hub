@@ -38,7 +38,7 @@ function App() {
                 position="bottom-right"
                 toastOptions={{
                   style: {
-                    fontFamily: "'DM Sans', system-ui, sans-serif",
+                    fontFamily: "'Segoe UI', Helvetica, Arial, sans-serif",
                   },
                 }}
               />

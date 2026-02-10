@@ -3,11 +3,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * META / FACEBOOK DESIGN SYSTEM
+ * ─────────────────────────────
+ * Primary Blue: #1877F2
+ * Background: #F0F2F5
+ * Cards: #FFFFFF with subtle shadow
+ * Text: #050505 primary, #65676B secondary
+ * System font stack: Segoe UI, Helvetica, Arial
+ * Border radius: 8px cards, 6px buttons
+ * Shadows: 0 1px 2px rgba(0,0,0,0.1)
+ */
+
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -40,54 +52,51 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: 'DM Sans', system-ui, sans-serif;
-  --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-  --color-amber: oklch(0.7 0.15 70);
-  --color-amber-light: oklch(0.85 0.1 70);
-  --color-amber-dark: oklch(0.55 0.15 70);
-  --color-sage: oklch(0.55 0.06 150);
-  --color-sage-light: oklch(0.75 0.04 150);
-  --color-warm-50: oklch(0.985 0.005 80);
-  --color-warm-100: oklch(0.97 0.008 80);
-  --color-warm-200: oklch(0.94 0.01 80);
-  --color-warm-300: oklch(0.9 0.012 80);
+  /* Meta custom tokens */
+  --color-meta-blue: oklch(0.55 0.22 260);
+  --color-meta-blue-light: oklch(0.92 0.04 255);
+  --color-meta-blue-hover: oklch(0.50 0.22 260);
+  --color-meta-green: oklch(0.65 0.19 145);
+  --color-meta-red: oklch(0.60 0.24 25);
+  --color-meta-yellow: oklch(0.80 0.16 85);
+  --font-sans: "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
 :root {
-  --primary: oklch(0.55 0.15 70);
-  --primary-foreground: oklch(0.98 0.005 80);
-  --sidebar-primary: oklch(0.6 0.13 70);
-  --sidebar-primary-foreground: oklch(0.98 0.005 80);
-  --chart-1: oklch(0.7 0.15 70);
-  --chart-2: oklch(0.55 0.06 150);
-  --chart-3: oklch(0.6 0.13 70);
-  --chart-4: oklch(0.45 0.12 70);
-  --chart-5: oklch(0.4 0.06 150);
-  --radius: 0.5rem;
-  --background: oklch(0.985 0.005 80);
-  --foreground: oklch(0.2 0.02 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 60);
+  --radius: 8px;
+  /* Meta Facebook Light Theme */
+  --background: oklch(0.955 0.005 250);       /* #F0F2F5 */
+  --foreground: oklch(0.13 0.01 250);         /* #050505 */
+  --card: oklch(1 0 0);                       /* #FFFFFF */
+  --card-foreground: oklch(0.13 0.01 250);    /* #050505 */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.02 60);
-  --secondary: oklch(0.97 0.008 80);
-  --secondary-foreground: oklch(0.35 0.02 60);
-  --muted: oklch(0.96 0.006 80);
-  --muted-foreground: oklch(0.5 0.015 60);
-  --accent: oklch(0.96 0.006 80);
-  --accent-foreground: oklch(0.2 0.02 60);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.008 80);
-  --input: oklch(0.92 0.008 80);
-  --ring: oklch(0.6 0.13 70);
-  --sidebar: oklch(0.98 0.005 80);
-  --sidebar-foreground: oklch(0.2 0.02 60);
-  --sidebar-accent: oklch(0.96 0.006 80);
-  --sidebar-accent-foreground: oklch(0.2 0.02 60);
-  --sidebar-border: oklch(0.92 0.008 80);
-  --sidebar-ring: oklch(0.6 0.13 70);
+  --popover-foreground: oklch(0.13 0.01 250);
+  --primary: oklch(0.55 0.22 260);            /* #1877F2 Facebook Blue */
+  --primary-foreground: oklch(1 0 0);         /* White */
+  --secondary: oklch(0.92 0.04 255);          /* Light blue bg */
+  --secondary-foreground: oklch(0.55 0.22 260);
+  --muted: oklch(0.955 0.005 250);            /* #F0F2F5 */
+  --muted-foreground: oklch(0.48 0.02 250);   /* #65676B */
+  --accent: oklch(0.955 0.005 250);
+  --accent-foreground: oklch(0.13 0.01 250);
+  --destructive: oklch(0.60 0.24 25);         /* #FA3E3E */
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.85 0.01 250);             /* #CED0D4 */
+  --input: oklch(0.85 0.01 250);
+  --ring: oklch(0.55 0.22 260);               /* Facebook Blue */
+  --chart-1: oklch(0.55 0.22 260);
+  --chart-2: oklch(0.65 0.19 145);
+  --chart-3: oklch(0.80 0.16 85);
+  --chart-4: oklch(0.60 0.24 25);
+  --chart-5: oklch(0.70 0.15 300);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.13 0.01 250);
+  --sidebar-primary: oklch(0.55 0.22 260);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.92 0.04 255);
+  --sidebar-accent-foreground: oklch(0.13 0.01 250);
+  --sidebar-border: oklch(0.85 0.01 250);
+  --sidebar-ring: oklch(0.55 0.22 260);
 }
 
 @layer base {
@@ -95,8 +104,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    @apply bg-background text-foreground;
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -136,37 +147,52 @@
     .container {
       padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1400px;
+      max-width: 1280px;
     }
   }
 
-  .font-display {
-    font-family: 'Instrument Serif', Georgia, serif;
+  /* Meta-style card shadow */
+  .meta-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  .font-mono-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8125rem;
-    letter-spacing: 0.02em;
+  .meta-card-elevated {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
   }
-}
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
+  /* Meta-style badge */
+  .meta-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: oklch(0.8 0.01 80);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.7 0.01 80);
+  .meta-badge-blue {
+    background: oklch(0.92 0.04 255);
+    color: oklch(0.55 0.22 260);
+  }
+
+  .meta-badge-green {
+    background: oklch(0.92 0.06 145);
+    color: oklch(0.45 0.15 145);
+  }
+
+  .meta-badge-yellow {
+    background: oklch(0.94 0.06 85);
+    color: oklch(0.50 0.14 85);
+  }
+
+  .meta-badge-red {
+    background: oklch(0.93 0.04 25);
+    color: oklch(0.50 0.20 25);
+  }
 }

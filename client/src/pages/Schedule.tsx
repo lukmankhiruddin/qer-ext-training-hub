@@ -1,6 +1,6 @@
 /*
  * Schedule — Weekly Calendar View with SME Filtering
- * Design: "Anthropic Warmth" — Smart Filter Pills
+ * Design: Meta/Facebook — White cards on gray bg, blue filter pills
  * When SME filters their name, unrelated days dim to 30% opacity
  * maintaining spatial context while highlighting relevant sessions
  */
@@ -8,7 +8,6 @@ import { useState, useMemo } from "react";
 import { useData } from "@/contexts/DataContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import EditableField from "@/components/EditableField";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Filter,
@@ -16,11 +15,9 @@ import {
   User,
   BookOpen,
   X,
-  ChevronDown,
   Plus,
   Trash2,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -135,229 +132,223 @@ export default function Schedule() {
   };
 
   return (
-    <div className="container py-8 md:py-12">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <Clock className="w-4 h-4 text-amber" />
-          <span className="font-mono-label text-amber uppercase tracking-wider">
-            Weekly Schedule
-          </span>
-        </div>
-        <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
-          Training Calendar
-        </h1>
-        <p className="text-muted-foreground max-w-lg">
-          Wave 2 Complex Object Training · Dublin · Feb 10–13, 2025
-        </p>
-      </div>
-
-      {/* Filters Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-8 p-4 bg-card rounded-xl border border-border/50">
-        {/* Search */}
-        <div className="relative flex-1 w-full sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search sessions..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="pl-9 bg-background"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* SME Filter */}
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
-          <Select value={selectedSME} onValueChange={setSelectedSME}>
-            <SelectTrigger className="w-full sm:w-[220px] bg-background">
-              <SelectValue placeholder="Filter by SME" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All SMEs</SelectItem>
-              {uniqueSMEs.map(sme => (
-                <SelectItem key={sme} value={sme}>
-                  {sme}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Active filter indicator */}
-        {selectedSME !== "all" && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center gap-2"
-          >
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber/15 text-amber-dark border border-amber/20">
-              <User className="w-3 h-3" />
-              {selectedSME}
-              <button
-                onClick={() => setSelectedSME("all")}
-                className="ml-1 hover:text-foreground transition-colors"
-              >
-                <X className="w-3 h-3" />
-              </button>
+    <div className="bg-[#F0F2F5] min-h-screen">
+      {/* Header — Meta style: white banner */}
+      <div className="bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
+        <div className="container py-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Clock className="w-4 h-4 text-primary" />
+            <span className="text-[13px] font-semibold text-primary uppercase tracking-wide">
+              Weekly Schedule
             </span>
-          </motion.div>
-        )}
-
-        {/* Admin: Add Session */}
-        {isAdmin && (
-          <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1.5 ml-auto">
-                <Plus className="w-3.5 h-3.5" />
-                Add Session
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className="font-display text-xl">Add Training Session</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">Day</Label>
-                    <Select value={newSession.day} onValueChange={v => setNewSession(p => ({ ...p, day: v }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">Type</Label>
-                    <Select value={newSession.type} onValueChange={v => setNewSession(p => ({ ...p, type: v as TrainingSession["type"] }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="live">Live Training</SelectItem>
-                        <SelectItem value="self-study">Self Study</SelectItem>
-                        <SelectItem value="upskilling">Upskilling</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">Start Time</Label>
-                    <Input value={newSession.timeStart} onChange={e => setNewSession(p => ({ ...p, timeStart: e.target.value }))} placeholder="9:00 AM" />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">End Time</Label>
-                    <Input value={newSession.timeEnd} onChange={e => setNewSession(p => ({ ...p, timeEnd: e.target.value }))} placeholder="10:00 AM" />
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">Training Title</Label>
-                  <Input value={newSession.training} onChange={e => setNewSession(p => ({ ...p, training: e.target.value }))} placeholder="e.g., Live Video Training" />
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">QER SME</Label>
-                  <Input value={newSession.sme} onChange={e => setNewSession(p => ({ ...p, sme: e.target.value }))} placeholder="e.g., Farrukh Ahmed (or N/A)" />
-                </div>
-                <Button onClick={handleAddSession} className="w-full" disabled={!newSession.training}>
-                  Add Session
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
+          </div>
+          <h1 className="text-[24px] font-bold text-[#050505] mb-1">
+            Training Calendar
+          </h1>
+          <p className="text-[15px] text-[#65676B]">
+            Wave 2 Complex Object Training · Dublin · Feb 10–13, 2025
+          </p>
+        </div>
       </div>
 
-      {/* Weekly Calendar Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        {DAYS.map(day => {
-          const sessions = getSessionsForDay(day);
-          const isDayActive = activeDays.has(day);
+      <div className="container py-4">
+        {/* Filters Bar — Meta style: white card with inputs */}
+        <div className="meta-card p-4 mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {/* Search */}
+            <div className="relative flex-1 w-full sm:max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A8D91]" />
+              <input
+                placeholder="Search sessions..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-[#F0F2F5] border-none rounded-full text-[15px] text-[#050505] placeholder-[#8A8D91] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition-colors duration-150"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8D91] hover:text-[#050505]"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
 
-          return (
-            <motion.div
-              key={day}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{
-                opacity: isDayActive ? 1 : 0.3,
-                y: 0,
-                scale: isDayActive && selectedSME !== "all" ? 1.01 : 1,
-              }}
-              transition={{ duration: 0.35, ease: "easeOut" as const }}
-              className="relative"
-            >
-              {/* Day Header */}
-              <div className={cn(
-                "sticky top-20 z-10 mb-3 p-3 rounded-xl border transition-all duration-300",
-                isDayActive && selectedSME !== "all"
-                  ? "bg-amber/5 border-amber/20"
-                  : "bg-card border-border/50"
-              )}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-display text-xl text-foreground">{day}</h3>
-                    <p className="font-mono-label text-muted-foreground text-[11px]">
-                      {DAY_DATES[day]}
-                    </p>
+            {/* SME Filter */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Filter className="w-4 h-4 text-[#65676B] shrink-0" />
+              <Select value={selectedSME} onValueChange={setSelectedSME}>
+                <SelectTrigger className="w-full sm:w-[220px] bg-[#F0F2F5] border-none rounded-lg h-9 text-[14px]">
+                  <SelectValue placeholder="Filter by SME" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All SMEs</SelectItem>
+                  {uniqueSMEs.map(sme => (
+                    <SelectItem key={sme} value={sme}>
+                      {sme}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Active filter indicator — Meta style: blue pill */}
+            {selectedSME !== "all" && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold bg-[#E7F3FF] text-primary">
+                <User className="w-3 h-3" />
+                {selectedSME}
+                <button
+                  onClick={() => setSelectedSME("all")}
+                  className="ml-0.5 hover:text-[#1565D8] transition-colors duration-150"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {/* Admin: Add Session */}
+            {isAdmin && (
+              <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 ml-auto bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none">
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Session
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="rounded-xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-[20px] font-bold text-[#050505]">Add Training Session</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Day</Label>
+                        <Select value={newSession.day} onValueChange={v => setNewSession(p => ({ ...p, day: v }))}>
+                          <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Type</Label>
+                        <Select value={newSession.type} onValueChange={v => setNewSession(p => ({ ...p, type: v as TrainingSession["type"] }))}>
+                          <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="live">Live Training</SelectItem>
+                            <SelectItem value="self-study">Self Study</SelectItem>
+                            <SelectItem value="upskilling">Upskilling</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Start Time</Label>
+                        <Input value={newSession.timeStart} onChange={e => setNewSession(p => ({ ...p, timeStart: e.target.value }))} placeholder="9:00 AM" className="rounded-lg" />
+                      </div>
+                      <div>
+                        <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">End Time</Label>
+                        <Input value={newSession.timeEnd} onChange={e => setNewSession(p => ({ ...p, timeEnd: e.target.value }))} placeholder="10:00 AM" className="rounded-lg" />
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">Training Title</Label>
+                      <Input value={newSession.training} onChange={e => setNewSession(p => ({ ...p, training: e.target.value }))} placeholder="e.g., Live Video Training" className="rounded-lg" />
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#65676B] mb-1.5 block font-semibold">QER SME</Label>
+                      <Input value={newSession.sme} onChange={e => setNewSession(p => ({ ...p, sme: e.target.value }))} placeholder="e.g., Farrukh Ahmed (or N/A)" className="rounded-lg" />
+                    </div>
+                    <Button onClick={handleAddSession} className="w-full bg-primary hover:bg-[#1565D8] text-white font-semibold rounded-lg shadow-none h-10" disabled={!newSession.training}>
+                      Add Session
+                    </Button>
                   </div>
-                  <span className="font-mono-label text-xs text-muted-foreground/60">
-                    {sessions.length} session{sessions.length !== 1 ? "s" : ""}
-                  </span>
-                </div>
-                {isDayActive && selectedSME !== "all" && (
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
-                    className="h-0.5 bg-amber rounded-full mt-2"
-                  />
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+        </div>
+
+        {/* Weekly Calendar Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {DAYS.map(day => {
+            const sessions = getSessionsForDay(day);
+            const isDayActive = activeDays.has(day);
+
+            return (
+              <div
+                key={day}
+                className={cn(
+                  "transition-opacity duration-200",
+                  isDayActive ? "opacity-100" : "opacity-30"
                 )}
-              </div>
-
-              {/* Sessions */}
-              <div className="space-y-2">
-                {sessions.length === 0 ? (
-                  <div className="p-6 text-center text-sm text-muted-foreground/50 border border-dashed border-border/30 rounded-xl">
-                    No sessions scheduled
+              >
+                {/* Day Header — Meta style: white card header */}
+                <div className={cn(
+                  "meta-card mb-3 p-3 transition-all duration-200",
+                  isDayActive && selectedSME !== "all"
+                    ? "ring-2 ring-primary/30"
+                    : ""
+                )}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-[17px] font-bold text-[#050505]">{day}</h3>
+                      <p className="text-[12px] text-[#8A8D91] font-medium">
+                        {DAY_DATES[day]}
+                      </p>
+                    </div>
+                    <span className="text-[12px] text-[#8A8D91] font-medium bg-[#F0F2F5] px-2 py-0.5 rounded-full">
+                      {sessions.length}
+                    </span>
                   </div>
-                ) : (
-                  sessions.map((session, i) => {
-                    const badge = getSessionTypeBadge(session.type);
-                    const highlighted = isSessionHighlighted(session);
+                  {isDayActive && selectedSME !== "all" && (
+                    <div className="h-[3px] bg-primary rounded-full mt-2" />
+                  )}
+                </div>
 
-                    return (
-                      <motion.div
-                        key={session.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{
-                          opacity: highlighted ? 1 : 0.25,
-                          y: 0,
-                        }}
-                        transition={{ delay: i * 0.04, duration: 0.3 }}
-                      >
-                        <Card className={cn(
-                          "border transition-all duration-300 group relative overflow-hidden",
-                          highlighted
-                            ? "border-border/60 shadow-sm hover:shadow-md"
-                            : "border-border/20 shadow-none"
-                        )}>
-                          {/* Type indicator bar */}
+                {/* Sessions */}
+                <div className="space-y-2">
+                  {sessions.length === 0 ? (
+                    <div className="p-6 text-center text-[14px] text-[#8A8D91] border-2 border-dashed border-[#CED0D4]/60 rounded-lg">
+                      No sessions scheduled
+                    </div>
+                  ) : (
+                    sessions.map((session) => {
+                      const badge = getSessionTypeBadge(session.type);
+                      const highlighted = isSessionHighlighted(session);
+                      const dotColor = session.type === "live"
+                        ? "bg-[#42B72A]"
+                        : session.type === "upskilling"
+                        ? "bg-primary"
+                        : "bg-[#8A8D91]";
+                      const badgeClass = session.type === "live"
+                        ? "meta-badge meta-badge-green"
+                        : session.type === "upskilling"
+                        ? "meta-badge meta-badge-blue"
+                        : "meta-badge meta-badge-yellow";
+
+                      return (
+                        <div
+                          key={session.id}
+                          className={cn(
+                            "meta-card relative group overflow-hidden transition-all duration-200",
+                            highlighted
+                              ? "shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
+                              : "opacity-40"
+                          )}
+                        >
+                          {/* Left color bar */}
                           <div className={cn(
-                            "absolute left-0 top-0 bottom-0 w-1 rounded-l-lg",
-                            session.type === "live" ? "bg-amber" : session.type === "upskilling" ? "bg-primary" : "bg-sage-light"
+                            "absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg",
+                            dotColor
                           )} />
 
-                          <CardContent className="p-3.5 pl-4.5 ml-1">
+                          <div className="p-3 pl-4">
                             {/* Time */}
-                            <div className="flex items-center gap-1.5 mb-2">
-                              <Clock className="w-3 h-3 text-muted-foreground/60" />
-                              <span className="font-mono-label text-[11px] text-muted-foreground">
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <Clock className="w-3 h-3 text-[#8A8D91]" />
+                              <span className="text-[12px] text-[#65676B] font-medium">
                                 {session.timeStart} — {session.timeEnd}
                               </span>
                             </div>
@@ -368,32 +359,29 @@ export default function Schedule() {
                                 value={session.training}
                                 fieldId={`session-${session.id}-training`}
                                 onSave={v => updateSession(session.id, { training: v })}
-                                className="text-sm font-medium text-foreground leading-snug block mb-2"
+                                className="text-[14px] font-semibold text-[#050505] leading-snug block mb-1.5"
                                 as="p"
                               />
                             ) : (
-                              <p className="text-sm font-medium text-foreground leading-snug mb-2">
+                              <p className="text-[14px] font-semibold text-[#050505] leading-snug mb-1.5">
                                 {session.training}
                               </p>
                             )}
 
                             {/* Badge + SME */}
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className={cn(
-                                "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium",
-                                badge.color
-                              )}>
+                              <span className={badgeClass}>
                                 {badge.label}
                               </span>
                               {session.sme !== "N/A" && (
-                                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1 text-[13px] text-[#65676B]">
                                   <User className="w-3 h-3" />
                                   {isAdmin ? (
                                     <EditableField
                                       value={session.sme}
                                       fieldId={`session-${session.id}-sme`}
                                       onSave={v => updateSession(session.id, { sme: v })}
-                                      className="text-xs"
+                                      className="text-[13px]"
                                     />
                                   ) : (
                                     session.sme
@@ -404,9 +392,9 @@ export default function Schedule() {
 
                             {/* Resources */}
                             {session.resources && session.resources.length > 0 && (
-                              <div className="mt-2 pt-2 border-t border-border/30">
+                              <div className="mt-2 pt-2 border-t border-[#CED0D4]/40">
                                 {session.resources.map((r, ri) => (
-                                  <div key={ri} className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70">
+                                  <div key={ri} className="flex items-center gap-1.5 text-[12px] text-[#8A8D91]">
                                     <BookOpen className="w-3 h-3 shrink-0" />
                                     <span className="truncate">{r}</span>
                                   </div>
@@ -421,40 +409,40 @@ export default function Schedule() {
                                   deleteSession(session.id);
                                   toast("Session removed");
                                 }}
-                                className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-destructive/60 hover:text-destructive transition-all"
+                                className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[#FA3E3E]/60 hover:text-[#FA3E3E] transition-all duration-150"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             )}
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    );
-                  })
-                )}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Legend */}
-      <div className="mt-10 p-4 bg-card rounded-xl border border-border/40">
-        <p className="font-mono-label text-muted-foreground/60 text-[11px] uppercase mb-3">Session Types</p>
-        <div className="flex flex-wrap gap-4">
-          {[
-            { type: "live" as const, color: "bg-amber" },
-            { type: "self-study" as const, color: "bg-sage-light" },
-            { type: "upskilling" as const, color: "bg-primary" },
-          ].map(item => {
-            const badge = getSessionTypeBadge(item.type);
-            return (
-              <div key={item.type} className="flex items-center gap-2">
-                <div className={cn("w-3 h-3 rounded-full", item.color)} />
-                <span className="text-sm text-muted-foreground">{badge.label}</span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Legend — Meta style */}
+        <div className="meta-card mt-6 p-4">
+          <p className="text-[12px] text-[#8A8D91] font-semibold uppercase tracking-wide mb-3">Session Types</p>
+          <div className="flex flex-wrap gap-5">
+            {[
+              { type: "live" as const, color: "bg-[#42B72A]" },
+              { type: "self-study" as const, color: "bg-[#8A8D91]" },
+              { type: "upskilling" as const, color: "bg-primary" },
+            ].map(item => {
+              const badge = getSessionTypeBadge(item.type);
+              return (
+                <div key={item.type} className="flex items-center gap-2">
+                  <div className={cn("w-3 h-3 rounded-full", item.color)} />
+                  <span className="text-[14px] text-[#65676B]">{badge.label}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
