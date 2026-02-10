@@ -5,6 +5,23 @@
  * Includes Wave 1 (completed), Wave 2 (active), Wave 3 (upcoming) programs
  */
 
+// ============================================================
+// TP Site Point of Contact — Support for all wave trainings
+// ============================================================
+export interface SiteContact {
+  name: string;
+  role: string;
+  phone: string;
+  description: string;
+}
+
+export const siteContact: SiteContact = {
+  name: "Hannah Wynne",
+  role: "TP Site POC",
+  phone: "085 219 0640",
+  description: "For any training support or queries across all waves",
+};
+
 export interface SME {
   id: string;
   name: string;

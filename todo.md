@@ -21,3 +21,5 @@
 - [x] Correct SME mapping: Andrea Draskovic for RGS1 (not Fernanda Affonso)
 - [x] Correct Wave 2a sessions to match PDF (HeX/DoI/SSI/ASE on Thu, ANSA/SSPx/GV on Thu, Self Study on Fri, RGS2 on Tue Feb 10)
 - [x] Verify Wave 2b Complex Object data matches PDF
+- [x] Add TP Site POC support contact (Hannah Wynne, 085 219 0640) visible across the site
+- [x] Make support contact accessible from Dashboard, Schedule, and other key pages

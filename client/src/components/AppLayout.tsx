@@ -25,6 +25,8 @@ import {
   Sparkles,
   LogIn,
   User,
+  Phone,
+  Headset,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +38,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { siteContact } from "@/lib/data";
 
 const META_LOGO = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663316909266/PANOQMtFAncFFhQj.png";
 
@@ -340,6 +343,45 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <main className="min-h-[calc(100vh-4rem)]">
         {children}
       </main>
+
+      {/* Support Contact Banner */}
+      <div className="border-t border-border/30 bg-gradient-to-r from-primary/[0.04] via-purple-500/[0.03] to-primary/[0.04]">
+        <div className="container py-3.5 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/15 to-purple-500/10 flex items-center justify-center shrink-0">
+              <Headset className="w-[18px] h-[18px] text-primary" />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-foreground">
+                Need Training Support?
+              </p>
+              <p className="text-[12px] text-muted-foreground">
+                {siteContact.description}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500/15 to-teal-500/10 flex items-center justify-center">
+                <span className="text-[9px] font-bold text-emerald-600">
+                  {siteContact.name.split(" ").map(n => n[0]).join("")}
+                </span>
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold text-foreground">{siteContact.name}</p>
+                <p className="text-[11px] text-muted-foreground">{siteContact.role}</p>
+              </div>
+            </div>
+            <a
+              href={`tel:${siteContact.phone.replace(/\s/g, "")}`}
+              className="inline-flex items-center gap-1.5 px-3.5 py-[7px] rounded-xl bg-emerald-500/10 text-emerald-700 text-[13px] font-semibold hover:bg-emerald-500/15 transition-all duration-200"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              {siteContact.phone}
+            </a>
+          </div>
+        </div>
+      </div>
 
       {/* Footer — Minimal, modern */}
       <footer className="border-t border-border/30 bg-white/40 backdrop-blur-sm">

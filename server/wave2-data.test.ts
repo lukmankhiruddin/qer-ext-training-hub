@@ -105,6 +105,30 @@ describe("Wave 2a — VG SME Deep Dive Week data accuracy", () => {
   });
 });
 
+describe("Site Contact — TP Site POC data", () => {
+  let siteContact: any;
+
+  beforeAll(async () => {
+    const dataModule = await import("../client/src/lib/data");
+    siteContact = dataModule.siteContact;
+  });
+
+  it("should have Hannah Wynne as the TP Site POC", () => {
+    expect(siteContact).toBeDefined();
+    expect(siteContact.name).toBe("Hannah Wynne");
+    expect(siteContact.role).toBe("TP Site POC");
+  });
+
+  it("should have the correct phone number", () => {
+    expect(siteContact.phone).toBe("085 219 0640");
+  });
+
+  it("should have a support description", () => {
+    expect(siteContact.description).toBeTruthy();
+    expect(siteContact.description.length).toBeGreaterThan(10);
+  });
+});
+
 describe("Wave 2b — Complex Object Training data accuracy", () => {
   let wave2bSchedule: any[];
   let programItinerary: any[];
