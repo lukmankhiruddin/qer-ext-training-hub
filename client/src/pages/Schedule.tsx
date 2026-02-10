@@ -46,7 +46,7 @@ import { toast } from "sonner";
 const WAVE_DATE_MAP: Record<string, Record<string, string>> = {
   "prog-1": { Monday: "Jan 20", Tuesday: "Jan 21", Wednesday: "Jan 22", Thursday: "Jan 23", Friday: "Jan 24" },
   "prog-2": { Monday: "Feb 10", Tuesday: "Feb 11", Wednesday: "Feb 12", Thursday: "Feb 13" },
-  "prog-3": { Monday: "Mar 10", Tuesday: "Mar 11", Wednesday: "Mar 12", Thursday: "Mar 13", Friday: "Mar 14" },
+  "prog-3": { Tuesday: "Mar 10", Wednesday: "Mar 11", Thursday: "Mar 12", Friday: "Mar 13" },
 };
 
 export default function Schedule() {

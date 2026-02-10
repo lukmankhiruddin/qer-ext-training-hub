@@ -126,15 +126,15 @@ export const programItinerary: ProgramItinerary[] = [
   {
     id: "prog-3",
     program: "TP Onboarding Schedule",
-    wave: "Wave 3 — Advanced Review & Certification",
+    wave: "Wave 3 — VG SME Deep Dive Week",
     location: "Dublin",
     startDate: "2025-03-10",
-    endDate: "2025-03-14",
+    endDate: "2025-03-13",
     status: "upcoming",
-    description: "Advanced training wave covering complex policy enforcement, cross-market calibration, and SME certification assessments. Prepares vendor reviewers for independent queue handling.",
-    modules: ["Advanced Policy Enforcement", "Cross-Market Calibration", "Edge Case Workshop", "Certification Assessment", "Independent Queue Prep"],
-    smesInvolved: ["Heather Yarrish", "Angela Zollo", "Carla Prati", "Fernanda Affonso", "Corneliu Onica"],
-    daysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    description: "VG SME Deep Dive training for 2 separate groups covering RGS1, RGS2, Live Video Review, HeX/DoI/SSI/ASE, CSE, BH/V&I/HC, FDSP + Spam, and ANSA/SSPx/GV modules. Includes site-led wellness activities and Ops/PTQ team coordination.",
+    modules: ["RGS1", "RGS2", "Live Video Review", "HeX, DoI, SSI, ASE", "CSE", "BH, V&I, HC", "FDSP + Spam", "ANSA, SSPx, GV"],
+    smesInvolved: ["Fernanda Affonso", "Farrukh Ahmed", "Iman Moussaoui", "Heather Yarrish", "Darla Nicole Florendo", "Mona Tirasetpakdee", "Ahmed Sayed"],
+    daysOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday"],
   },
 ];
 
@@ -180,24 +180,35 @@ export const wave2Schedule: TrainingSession[] = [
   { id: "ts-13", day: "Thursday", date: "2025-02-13", timeStart: "4:30 PM", timeEnd: "5:30 PM", training: "Profile Self Study", sme: "N/A", type: "self-study", resources: [], waveId: "prog-2" },
 ];
 
-// Wave 3 — Advanced Review & Certification (upcoming, Mar 10-14, 2025)
+// Wave 3 — VG SME Deep Dive Week (upcoming, Mar 10-13, 2025) — from real PDF
+// Training for 2 separate Groups (no large rooms available)
+// Each session runs for both Group 1 and Group 2 with different modules
 export const wave3Schedule: TrainingSession[] = [
-  { id: "w3-1", day: "Monday", date: "2025-03-10", timeStart: "9:30 AM", timeEnd: "11:00 AM", training: "Advanced Policy Enforcement — Overview", sme: "Heather Yarrish", type: "live", resources: [], waveId: "prog-3" },
-  { id: "w3-2", day: "Monday", date: "2025-03-10", timeStart: "11:30 AM", timeEnd: "12:30 PM", training: "Advanced Policy Self Study", sme: "N/A", type: "self-study", resources: ["Advanced Policy Handbook"], waveId: "prog-3" },
-  { id: "w3-3", day: "Monday", date: "2025-03-10", timeStart: "2:00 PM", timeEnd: "3:30 PM", training: "Advanced Policy Enforcement — Deep Dive", sme: "Angela Zollo", type: "live", resources: [], waveId: "prog-3" },
-  { id: "w3-4", day: "Monday", date: "2025-03-10", timeStart: "4:00 PM", timeEnd: "5:00 PM", training: "Policy Case Studies Self Study", sme: "N/A", type: "self-study", resources: ["Case Studies Collection"], waveId: "prog-3" },
-  { id: "w3-5", day: "Tuesday", date: "2025-03-11", timeStart: "9:30 AM", timeEnd: "11:00 AM", training: "Cross-Market Calibration — Methodology", sme: "Carla Prati", type: "live", resources: [], waveId: "prog-3" },
-  { id: "w3-6", day: "Tuesday", date: "2025-03-11", timeStart: "11:30 AM", timeEnd: "12:30 PM", training: "Calibration Self Study", sme: "N/A", type: "self-study", resources: ["Cross-Market Calibration Guide"], waveId: "prog-3" },
-  { id: "w3-7", day: "Tuesday", date: "2025-03-11", timeStart: "2:00 PM", timeEnd: "4:00 PM", training: "Cross-Market Calibration Workshop", sme: "Carla Prati", type: "upskilling", resources: [], waveId: "prog-3" },
-  { id: "w3-8", day: "Wednesday", date: "2025-03-12", timeStart: "9:30 AM", timeEnd: "11:00 AM", training: "Edge Case Workshop — Complex Scenarios", sme: "Corneliu Onica", type: "upskilling", resources: ["Edge Case Scenario Pack"], waveId: "prog-3" },
-  { id: "w3-9", day: "Wednesday", date: "2025-03-12", timeStart: "11:30 AM", timeEnd: "12:30 PM", training: "Edge Case Self Study", sme: "N/A", type: "self-study", resources: ["Edge Case Reference Guide"], waveId: "prog-3" },
-  { id: "w3-10", day: "Wednesday", date: "2025-03-12", timeStart: "2:00 PM", timeEnd: "4:00 PM", training: "Edge Case Workshop — Group Exercise", sme: "Fernanda Affonso", type: "upskilling", resources: [], waveId: "prog-3" },
-  { id: "w3-11", day: "Thursday", date: "2025-03-13", timeStart: "9:30 AM", timeEnd: "12:00 PM", training: "Certification Assessment — Written", sme: "Heather Yarrish", type: "live", resources: ["Certification Prep Guide"], waveId: "prog-3" },
-  { id: "w3-12", day: "Thursday", date: "2025-03-13", timeStart: "2:00 PM", timeEnd: "4:00 PM", training: "Certification Assessment — Practical", sme: "Angela Zollo", type: "live", resources: [], waveId: "prog-3" },
-  { id: "w3-13", day: "Thursday", date: "2025-03-13", timeStart: "4:30 PM", timeEnd: "5:30 PM", training: "Assessment Review Self Study", sme: "N/A", type: "self-study", resources: ["Assessment Review Checklist"], waveId: "prog-3" },
-  { id: "w3-14", day: "Friday", date: "2025-03-14", timeStart: "9:30 AM", timeEnd: "11:00 AM", training: "Independent Queue Preparation", sme: "Fernanda Affonso", type: "live", resources: [], waveId: "prog-3" },
-  { id: "w3-15", day: "Friday", date: "2025-03-14", timeStart: "11:30 AM", timeEnd: "12:30 PM", training: "Queue Prep Self Study", sme: "N/A", type: "self-study", resources: ["Queue Readiness Checklist"], waveId: "prog-3" },
-  { id: "w3-16", day: "Friday", date: "2025-03-14", timeStart: "2:00 PM", timeEnd: "3:30 PM", training: "Wave 3 Wrap-Up & Next Steps", sme: "Heather Yarrish", type: "live", resources: [], waveId: "prog-3" },
+  // TUESDAY MAR 10th
+  { id: "w3-1", day: "Tuesday", date: "2025-03-10", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "RGS1 (Group 1)", sme: "Fernanda Affonso", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-2", day: "Tuesday", date: "2025-03-10", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "Live Video Review (Group 2)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-3", day: "Tuesday", date: "2025-03-10", timeStart: "2:00 PM", timeEnd: "3:00 PM", training: "Live Video Review (Group 1)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-4", day: "Tuesday", date: "2025-03-10", timeStart: "2:30 PM", timeEnd: "4:00 PM", training: "RGS1 (Group 2)", sme: "Fernanda Affonso", type: "live", resources: [], waveId: "prog-3" },
+  // WEDNESDAY MAR 11th
+  { id: "w3-5", day: "Wednesday", date: "2025-03-11", timeStart: "9:30 AM", timeEnd: "12:00 PM", training: "HeX, DoI, SSI, ASE (Group 1)", sme: "Iman Moussaoui", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-6", day: "Wednesday", date: "2025-03-11", timeStart: "9:00 AM", timeEnd: "10:30 AM", training: "CSE (Group 2)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-7", day: "Wednesday", date: "2025-03-11", timeStart: "11:00 AM", timeEnd: "12:00 PM", training: "Site-Led Wellness Activity (Group 2)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-3" },
+  { id: "w3-8", day: "Wednesday", date: "2025-03-11", timeStart: "2:00 PM", timeEnd: "3:00 PM", training: "CSE (Group 2)", sme: "Farrukh Ahmed", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-9", day: "Wednesday", date: "2025-03-11", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "HeX, DoI, SSI, ASE (Group 1)", sme: "Iman Moussaoui", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-10", day: "Wednesday", date: "2025-03-11", timeStart: "3:30 PM", timeEnd: "4:30 PM", training: "Site-Led Wellness Activity (Group 2)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-3" },
+  // THURSDAY MAR 12th
+  { id: "w3-11", day: "Thursday", date: "2025-03-12", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "BH, V&I, HC (Group 1)", sme: "Heather Yarrish", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-12", day: "Thursday", date: "2025-03-12", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "RGS2 (Group 2)", sme: "Darla Nicole Florendo", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-13", day: "Thursday", date: "2025-03-12", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "RGS2 (Group 1)", sme: "Darla Nicole Florendo", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-14", day: "Thursday", date: "2025-03-12", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "BH, V&I, HC (Group 2)", sme: "Heather Yarrish", type: "live", resources: [], waveId: "prog-3" },
+  // FRIDAY MAR 13th
+  { id: "w3-15", day: "Friday", date: "2025-03-13", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "FDSP + Spam (Group 1)", sme: "Mona Tirasetpakdee", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-16", day: "Friday", date: "2025-03-13", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "ANSA, SSPx, GV (Group 2)", sme: "Ahmed Sayed", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-17", day: "Friday", date: "2025-03-13", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "ANSA, SSPx, GV (Group 1)", sme: "Ahmed Sayed", type: "live", resources: [], waveId: "prog-3" },
+  { id: "w3-18", day: "Friday", date: "2025-03-13", timeStart: "3:00 PM", timeEnd: "4:30 PM", training: "FDSP + Spam (Group 2)", sme: "Mona Tirasetpakdee", type: "live", resources: [], waveId: "prog-3" },
+  // Ops/PTQ Team sessions
+  { id: "w3-19", day: "Wednesday", date: "2025-03-11", timeStart: "TBD", timeEnd: "TBD", training: "Ops/PTQ Team Session (TBD)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-3" },
+  { id: "w3-20", day: "Friday", date: "2025-03-13", timeStart: "10:00 AM", timeEnd: "12:00 PM", training: "Ops Lead Sync with Site Leads (TBD)", sme: "N/A", type: "upskilling", resources: [], waveId: "prog-3" },
 ];
 
 // Combined schedule (backward compatible)
